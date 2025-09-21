@@ -3,6 +3,8 @@ import cors from 'cors';
 import authRoutes from './routes/auth.routes';
 import { AppDataSource } from './config/data-source';
 import * as dotenv from "dotenv";
+import authMiddleware from './middlewares/auth.middleware';
+
 
 dotenv.config();
 const app = express()
@@ -20,6 +22,8 @@ AppDataSource.initialize()
 // Middleware
 app.use(cors());
 app.use(express.json()); 
+app.use(authMiddleware);
+
 
 // Rutas
 app.use('/auth', authRoutes);

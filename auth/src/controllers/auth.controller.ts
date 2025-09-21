@@ -46,10 +46,11 @@ export class AuthController {
             return;
         }
 
-
+        console.log("generando token");
         const token = createToken(user.userId, user.role.roleId);
         const changePassword = user.state === 2;
 
+        console.log("autenticación exitosa");
         return res.status(200).json({
             message: "Autenticación exitosa",
             data:{
@@ -59,6 +60,28 @@ export class AuthController {
             }
         });
     };
+
+    changePassword = async (req: Request, res: Response) => {
+        const { currentPassword, newPassword } = req.body;
+        if (!currentPassword || !newPassword) {
+            res.status(400);
+            res.json({ message: "Parámetros incompletos" });
+            return;
+        }
+
+        //validar que sean diferentes
+        if (currentPassword === newPassword) {
+            res.status(400);
+            res.json({ message: "La nueva contraseña debe ser diferente a la actual" });
+            return;
+        }
+
+
+
+
+
+
+    }
 
 
     logout = (req: Request, res: Response) => {

@@ -18,4 +18,15 @@ export class UserService {
             ] 
         });
     }
+
+    async findById(userId: number): Promise<AdmUser | null> {
+        return this.userRepository.findOne({ 
+            where: { userId,state: In([1,2]) }, 
+            relations: [
+                'role', 
+                'role.rolePermissions', 
+                'role.rolePermissions.permission'
+            ] 
+        });
+    }
 }
