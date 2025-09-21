@@ -29,4 +29,9 @@ export class UserService {
             ] 
         });
     }
+
+    async updatePassword(userId: number, newPassword: string): Promise<boolean> {
+        const result = await this.userRepository.update({ userId }, { password: newPassword, state: 1 });
+        return result.affected !== undefined && result.affected > 0;
+    }
 }

@@ -63,6 +63,7 @@ export class AuthController {
 
     changePassword = async (req: Request, res: Response) => {
         const { currentPassword, newPassword } = req.body;
+        const currentUser = res.locals.currentUser;
         if (!currentPassword || !newPassword) {
             res.status(400);
             res.json({ message: "Parámetros incompletos" });
@@ -76,11 +77,47 @@ export class AuthController {
             return;
         }
 
+        //validar que la contrseña sea alfanumerica, tenga al menos 8 caracteres, una mayuscula, una minuscula, un caracter especial
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            res.status(400);
+            res.json({ message: "La nueva contraseña no cumple con los requisitos de seguridad. Debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial." });
+            return;
+        }
+
+        console.log(currentUser)
+
+        //buscar el usuario por su id
+        const user = await userService.findById(currentUser.userId);
+        if (!user) {
+            res.status(404);
+            res.json({ message: "Usuario no encontrado" });
+            return;
+        }
+        //validar la contraseña actual
+        const isValid = await bcrypt.compare(currentPassword, user.password);
+        if (!isValid) {
+            res.status(401)
+            res.json({ message: "Contraseña actual incorrecta" });
+            return;
+        }
+
+        //encriptar la nueva contraseña
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        //actualizar la contraseña en la base de datos
+        const passwordUpdated = await userService.updatePassword(user.userId, hashedPassword);
+
+        if (!passwordUpdated) {
+            res.status(500);
+            res.json({ message: "No se pudo actualizar la contraseña, favor de intentar nuevamente" });
+            return;
+        }
 
 
-
-
-
+        return res.status(200).json({
+            message: "Contraseña actualizada correctamente"
+        });
     }
 
 
