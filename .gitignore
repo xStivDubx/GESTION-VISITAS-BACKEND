@@ -1,0 +1,38 @@
+node_modules
+dist/*
+dist
+/**/dist
+build/*
+build
+/**/build
+.aws-sam/
+*.env
+*.zip
+nodejs
+*.xlsx
+
+samconfig.toml
+/samconfig.toml
+
+
+# ============================
+# IDE / Editor
+# ============================
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# ============================
+# Coverage / Tests
+# ============================
+coverage/
+.nyc_output/
+jest-cache/
+jest-test-results.json
+
+# ============================
+# OS files
+# ============================
+Thumbs.db

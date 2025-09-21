@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  # Globals define las configuraciones que se aplican a todas las funciones por defecto
+  Function:
+    Timeout: 15
+    MemorySize: 512
+    Runtime: nodejs22.x
+    Architectures:
+      - arm64
+
+Resources:
+
+
+  AuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: auth/
+      Handler: index.handler
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /auth/hello
+            Method: get
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true             
+        Target: "es2022"        
+        Sourcemap: false        
+        EntryPoints:
+          - index.ts 
+
+
+# Outputs define las salidas que se mostrarán al finalizar el despliegue
+Outputs:
+  ProjectEndpoint:
+    Description: "API endpoint URL for dev stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
