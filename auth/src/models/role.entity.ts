@@ -1,16 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, UpdateDateColumn, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  UpdateDateColumn,
+  CreateDateColumn,
+} from 'typeorm';
 import { AdmUser } from './user.entity';
 import { RolePermission } from './role-permission.entity';
 
 @Entity('ADM_ROLE')
 export class Role {
-  @PrimaryGeneratedColumn({ name: 'ROLE_ID' })
+  @PrimaryGeneratedColumn({ name: 'ROLE_ID', type: 'int' })
   roleId: number;
 
-  @Column({ name: 'NAME', length: 100 })
+  @Column({ name: 'NAME', type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ name: 'DESCRIPTION', length: 255, nullable: true })
+  @Column({ name: 'DESCRIPTION', type: 'varchar', length: 255, nullable: true })
   description: string;
 
   @Column({ name: 'STATE', type: 'tinyint', default: 1 })

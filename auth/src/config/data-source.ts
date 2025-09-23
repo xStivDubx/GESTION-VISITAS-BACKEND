@@ -7,12 +7,14 @@ import { RolePermission } from '../models/role-permission.entity';
 import * as dotenv from "dotenv";
 
 dotenv.config();
+const entities = [AdmUser, Role, Permission, RolePermission];
+
 
 const url: string = process.env.DB_URL;
 export const AppDataSource = new DataSource({
   type: "mysql",
   url: url,
-  entities: [AdmUser, Role, Permission, RolePermission],
+  entities: entities,
   synchronize: false,
   logging: false,
 });

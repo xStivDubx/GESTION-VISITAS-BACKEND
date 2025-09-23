@@ -15,5 +15,5 @@
   },
   // include package.json in the compilation that is one level above the rootDir
   "include": [ "./**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules","dist",".env"]
 }
