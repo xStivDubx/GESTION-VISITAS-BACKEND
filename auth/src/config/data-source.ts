@@ -8,7 +8,7 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const url: string = `mysql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}?ssl=false&allowPublicKeyRetrieval=true&serverTimezone=UTC`;
+const url: string = process.env.DB_URL;
 export const AppDataSource = new DataSource({
   type: "mysql",
   url: url,

@@ -5,12 +5,11 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es6",
+    "target": "ES2022",
     "noImplicitAny": true,
     "moduleResolution": "node",
-    "sourceMap": true,
+    "sourceMap": false,
     "outDir": "dist",
-    // 👇 Necesarios para TypeORM
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },

@@ -10,6 +10,20 @@ Globals:
     Architectures:
       - arm64
 
+Parameters:
+  dbUrl:
+    Type: String
+    Description: "Database connection URL"
+
+  jwtSecret:
+    Type: String
+    Description: "Secret key for JWT"
+  
+  jwtExpiresIn:
+    Type: String
+    Description: "JWT expiration time"
+
+
 Resources:
 
 
@@ -19,11 +33,21 @@ Resources:
       CodeUri: auth/
       Handler: index.handler
       Events:
-        HelloWorld:
+        Profile:
           Type: Api
           Properties:
-            Path: /auth/hello
+            Path: /auth/profile
             Method: get
+        Login:
+          Type: Api
+          Properties:
+            Path: /auth/login
+            Method: post
+        ChangePassword:
+          Type: Api
+          Properties:
+            Path: /auth/change-password
+            Method: post
     Metadata:
       BuildMethod: esbuild
       BuildProperties:

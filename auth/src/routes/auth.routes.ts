@@ -6,7 +6,6 @@ const router = Router();
 const controller = new AuthController();
 
 // GET /hello - Ruta que devuelve Hola mundo
-router.get('/hello', controller.helloWorld);
 router.post('/login', controller.login);
 router.get('/profile', controller.profile);
 router.post('/change-password', controller.changePassword);
