@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "rootDir": "./",
+    "resolveJsonModule": true,
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2022",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "outDir": "dist"
+  },
+  // include package.json in the compilation that is one level above the rootDir
+  "include": [ "./**/*.ts"],
+  "exclude": ["node_modules","dist",".env"]
+}
