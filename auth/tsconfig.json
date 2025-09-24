@@ -9,9 +9,7 @@
     "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": false,
-    "outDir": "dist",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "outDir": "dist"
   },
   // include package.json in the compilation that is one level above the rootDir
   "include": [ "./**/*.ts"],

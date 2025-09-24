@@ -1,27 +1,27 @@
-import { AppDataSource } from "../config/data-source";
-import { AdmUser } from "../models/user.entity";
-import { Role } from '../models/role.entity';
-import { RolePermission } from "../models/role-permission.entity";
+import { RowDataPacket } from "mysql2/typings/mysql/lib/protocol/packets/RowDataPacket";
+import { db } from "../config/connection";
 
 export class RolePermissionService {
 
-    private rolePermissionRepository = AppDataSource.getRepository(RolePermission);
 
-    async getPermissionByRoleId(roleId: number): Promise<{permissionId: number, name: string, icon: string, code: string, routeFront: string}[]> {
-        const rolePermissions = await this.rolePermissionRepository.find({
-            where: { role: { roleId }, permission: { state: 1 } },
-            relations: ['permission'],
-            order: { permission: { name: 'ASC' } }
-        });
+    async getPermissionByRoleId(roleId: number): Promise<{ permissionId: number, name: string, icon: string, code: string, routeFront: string }[]> {
+        const query = `
+            SELECT 
+            p.permission_id   AS permissionId,
+            p.name            AS name,
+            p.icon            AS icon,
+            p.code            AS code,
+            p.route_front     AS routeFront
+          FROM ADM_ROLE_PERMISSION rp
+          INNER JOIN ADM_PERMISSION p  ON rp.permission_id = p.permission_id
+          WHERE rp.role_id = ? 
+            AND p.state = 1
+          ORDER BY p.name ASC
+            `;
 
-        // Mapear para devolver solo las propiedades específicas del objeto permission
-        return rolePermissions.map(rp => ({
-            permissionId: rp.permission.permissionId,
-            name: rp.permission.name,
-            icon: rp.permission.icon,
-            code: rp.permission.code,
-            routeFront: rp.permission.routeFront
-        }));
+        const [rows] = await db.query<RowDataPacket[]>(query, [roleId]);
+
+        return rows as any[];
     }
 
 

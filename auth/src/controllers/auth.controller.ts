@@ -44,7 +44,7 @@ export class AuthController {
             //console.log("contraseña:",contras);
 
             console.log("validando contraseña");
-            const isValid = await bcrypt.compare(password, user.password);
+            const isValid = await bcrypt.compare(password, user[0].password);
             if (!isValid) {
                 res.status(401)
                 res.json({ message: "Usuario y/o Contraseña incorrecta" });
@@ -52,14 +52,14 @@ export class AuthController {
             }
 
             console.log("generando token");
-            const token = createToken(user.userId, user.role.roleId);
-            const changePassword = user.state === 2;
+            const token = createToken(user[0].userId, user[0].roleId);
+            const changePassword = user[0].state === 2;
 
             console.log("autenticación exitosa");
             return res.status(200).json({
                 message: "Autenticación exitosa",
                 data: {
-                    username: user.username,
+                    username: user[0].username,
                     changePassword: changePassword,
                     token: token
                 }
@@ -76,6 +76,7 @@ export class AuthController {
         try {
             const { currentPassword, newPassword } = req.body;
             const currentUser = res.locals.currentUser;
+            console.log("validando parametros enviados");
             if (!currentPassword || !newPassword) {
                 res.status(400);
                 res.json({ message: "Parámetros incompletos" });
@@ -97,8 +98,8 @@ export class AuthController {
                 return;
             }
 
-            console.log(currentUser)
 
+            console.log("buscando usuario en base de datos");
             //buscar el usuario por su id
             const user = await userService.findById(currentUser.userId);
             if (!user) {
@@ -107,18 +108,19 @@ export class AuthController {
                 return;
             }
             //validar la contraseña actual
-            const isValid = await bcrypt.compare(currentPassword, user.password);
+            const isValid = await bcrypt.compare(currentPassword, user[0].password);
             if (!isValid) {
                 res.status(401)
                 res.json({ message: "Contraseña actual incorrecta" });
                 return;
             }
 
+            console.log("actualizando contraseña");
             //encriptar la nueva contraseña
             const hashedPassword = await bcrypt.hash(newPassword, 10);
 
             //actualizar la contraseña en la base de datos
-            const passwordUpdated = await userService.updatePassword(user.userId, hashedPassword);
+            const passwordUpdated = await userService.updatePassword(user[0].userId, hashedPassword);
 
             if (!passwordUpdated) {
                 res.status(500);
@@ -126,7 +128,7 @@ export class AuthController {
                 return;
             }
 
-
+            console.log("contraseña actualizada correctamente");
             return res.status(200).json({
                 message: "Contraseña actualizada correctamente"
             });
@@ -170,8 +172,8 @@ export class AuthController {
 
             return res.status(200).json({
                 data: {
-                    username: user.username,
-                    role: user.role.name,
+                    username: user[0].username,
+                    role: user[0].roleName,
                     permissions: permissions
                 }
             });

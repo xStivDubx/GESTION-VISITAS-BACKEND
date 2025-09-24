@@ -56,12 +56,11 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: "es2022"
         Sourcemap: false
         EntryPoints:
           - index.ts
-        Tsconfig: tsconfig.json
         
             
 
