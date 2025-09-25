@@ -7,7 +7,7 @@ import { RolePermissionService } from '../services/rolePermission.service';
 
 const userService = new UserService();
 
-export class UserController {
+export class AppController {
 
 
    

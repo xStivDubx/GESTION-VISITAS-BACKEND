@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { UserController } from '../controllers/auth.controller';
+import { AppController } from '../controllers/Appcontroller';
 
 const router = Router();
 
-const controller = new UserController();
+const controller = new AppController();
 
 
 router.get('/', controller.getAllUsers);
