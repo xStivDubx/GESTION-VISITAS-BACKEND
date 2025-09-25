@@ -19,11 +19,11 @@ export class UserService {
                 p.code          AS code,
                 p.route_front   AS routeFront
             FROM ADM_USER  u
-            INNER JOIN ADM_ROLE  r 
+            LEFT JOIN ADM_ROLE  r 
             ON u.role_id = r.role_id
-            INNER JOIN ADM_ROLE_PERMISSION rp 
+            LEFT JOIN ADM_ROLE_PERMISSION rp 
             ON r.role_id = rp.role_id
-            INNER JOIN ADM_PERMISSION  p 
+            LEFT JOIN ADM_PERMISSION  p 
             ON rp.permission_id = p.permission_id
             WHERE u.username = ?
             AND u.state IN (1,2)
@@ -41,33 +41,19 @@ export class UserService {
 
 
     async findById(userId: number): Promise<any | null> {
+      console.log("findById userId:", userId);
         const query = `
 SELECT 
       u.user_id       AS userId,
       u.username      AS username,
-      u.password      AS password,
-      r.role_id       AS roleId,
-      r.name          AS roleName,
-      p.permission_id AS permissionId,
-      p.name          AS permissionName,
-      p.icon          AS icon,
-      p.code          AS code,
-      p.route_front   AS routeFront
+      u.password      AS password
     FROM ADM_USER u
-    INNER JOIN ADM_ROLE r 
-      ON u.role_id = r.role_id
-    INNER JOIN ADM_ROLE_PERMISSION rp 
-      ON r.role_id = rp.role_id
-    INNER JOIN ADM_PERMISSION  p 
-      ON rp.permission_id = p.permission_id
     WHERE u.user_id = ?
       AND u.state IN (1,2)
-      AND p.state = 1
-    ORDER BY p.name ASC
   `;
 
         const [rows] = await db.query<RowDataPacket[]>(query, [userId]);
-
+        console.log("Filas obtenidas:", rows);
         if (rows.length === 0) return null;
         return rows;
     }

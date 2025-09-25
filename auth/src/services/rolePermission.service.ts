@@ -13,7 +13,7 @@ export class RolePermissionService {
             p.code            AS code,
             p.route_front     AS routeFront
           FROM ADM_ROLE_PERMISSION rp
-          INNER JOIN ADM_PERMISSION p  ON rp.permission_id = p.permission_id
+          LEFT JOIN ADM_PERMISSION p  ON rp.permission_id = p.permission_id
           WHERE rp.role_id = ? 
             AND p.state = 1
           ORDER BY p.name ASC
