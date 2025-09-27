@@ -46,6 +46,39 @@ export class UserService {
 
     }
 
+    async findAssingTechnical(supervisorId: number, technicalId: number): Promise<any | null> {
+        const query = `select ast.SUPERVISOR_TECHNICIAN_ID  from ADM_SUPERVISOR_TECHNICIAN ast where ast.SUPERVISOR_ID = ? and ast.TECHNICIAN_ID = ?`
+        const [rows] = await db.query<RowDataPacket[]>(query, [supervisorId, technicalId]);
+        return rows.length > 0 ? rows[0] : null;
+    }
+
+    async removeTechnicalAssignment(supervisorId: number, technicalId: number): Promise<boolean> {
+        try {
+            const query = `DELETE FROM ADM_SUPERVISOR_TECHNICIAN WHERE SUPERVISOR_ID = ? AND TECHNICIAN_ID = ?`;
+            const [result] = await db.query<ResultSetHeader>(query, [supervisorId, technicalId]);
+            if (result.affectedRows === 0) {
+                return false;
+            }
+            return true;
+        } catch (error) {
+            console.error("Error al eliminar la asignación técnica:", error);
+            return false;
+        }
+    }
+
+    async assignTechnical(supervisorId: number, technicalId: number): Promise<boolean> {
+        try {
+            const query = `INSERT INTO ADM_SUPERVISOR_TECHNICIAN (SUPERVISOR_ID, TECHNICIAN_ID) VALUES (?, ?)`;
+            const [result] = await db.query<ResultSetHeader>(query, [supervisorId, technicalId]);
+            if (result.affectedRows === 0) {
+                return false;
+            }
+            return true;
+        } catch (error) {
+            console.error("Error al asignar el técnico:", error);
+            return false;
+        }
+    }
 
     async createUser(currentUserId: number, token: string, userData: { name: string; lastname: string; email: string; phone: string; username: string; roleId: number; }): Promise<number> {
 

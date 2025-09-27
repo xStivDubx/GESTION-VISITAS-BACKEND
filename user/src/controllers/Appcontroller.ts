@@ -260,5 +260,57 @@ export class AppController {
     }
 
 
-    
+
+    assignTechnical = async (req: Request, res: Response) => {
+        const { supervisorId, technicalId } = req.body;
+        try {
+            // Validar parámetros
+            if (!supervisorId || !technicalId) {
+                return res.status(400).json({ message: "Faltan parámetros obligatorios" });
+            }
+
+            // Validar si el supervisor existe
+            const supervisor = await userService.getUserById(supervisorId);
+            if (!supervisor) {
+                return res.status(404).json({ message: "Supervisor no encontrado" });
+            }
+
+            // Validar si el técnico existe
+            const technical = await userService.getUserById(technicalId);
+            if (!technical) {
+                return res.status(404).json({ message: "Técnico no encontrado" });
+            }
+
+            const existingAssignment = await userService.findAssingTechnical(supervisorId, technicalId);
+            if (existingAssignment) {
+                // Si ya existe una asignación, se elimina
+                const result = await userService.removeTechnicalAssignment(supervisorId, technicalId);
+                if (!result) {
+                    return res.status(500).json({ message: "No fue posible eliminar la asignación del técnico, favor intente más tarde" });
+                }
+                return res.status(200).json({ message: "Asignación de técnico eliminada exitosamente" });
+            } else {
+                // Si no existe una asignación, se crea
+                const result = await userService.assignTechnical(supervisorId, technicalId);
+                if (!result) {
+                    return res.status(500).json({ message: "No fue posible crear la asignación del técnico, favor intente más tarde" });
+                }
+                return res.status(200).json({ message: "Asignación de técnico creada exitosamente" });
+            }
+
+
+
+
+
+        } catch (error) {
+            console.error("Error en el proceso de asignación de técnico:", error);
+            res.status(500).json({ message: "Ocurrió un error en el proceso de asignación de técnico", error: error.message });
+        }
+    }
+
+
+
+
+
+
 }

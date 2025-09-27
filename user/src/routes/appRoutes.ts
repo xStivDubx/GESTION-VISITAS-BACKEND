@@ -13,5 +13,6 @@ router.post('/save', controller.saveUser);
 router.put('/update', controller.updateUser);
 router.put('/delete', controller.deleteUser);
 router.put('/reset-password', controller.resetPassword);
+router.post('/assign-technical', controller.assignTechnical);
 
 export default router;
