@@ -26,6 +26,31 @@ Parameters:
 
 Resources:
 
+  MailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: mail/
+      Handler: index.handler
+      Environment:
+        Variables:
+          DB_URL: !Ref dbUrl
+          JWT_SECRET: !Ref jwtSecret
+      Events:
+        SendMail:
+          Type: Api
+          Properties:
+            Path: /mail/send
+            Method: post
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2022"
+        Sourcemap: false
+        EntryPoints:
+          - index.ts
+
+
 
   AuthFunction:
     Type: AWS::Serverless::Function
