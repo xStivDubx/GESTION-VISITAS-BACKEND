@@ -2,6 +2,7 @@ import { RowDataPacket, ResultSetHeader } from "mysql2";
 import { db } from "../config/connection";
 import { ConfigService } from "./config.service";
 import bcrypt from "bcryptjs";
+import { sendMail } from "../utils/sendMail";
 
 const configService = new ConfigService();
 
@@ -39,20 +40,19 @@ export class UserService {
     }
 
 
-    async createUser(currentUserId: number, userData: { name: string; lastname: string; email: string; phone: string; username: string; roleId: number; }): Promise<boolean> {
+    async createUser(currentUserId: number, token: string, userData: { name: string; lastname: string; email: string; phone: string; username: string; roleId: number; }): Promise<number> {
 
         try {
             // Generar una contraseña temporal
             const tempPassword = Math.random().toString(36).slice(-8); // Genera una cadena aleatoria de 8 caracteres
-            console.log("Contraseña temporal generada:", tempPassword);
 
             // Hashear la contraseña temporal
             const hashedPassword = await bcrypt.hash(tempPassword, 10);
-            console.log("Contraseña temporal hasheada:", hashedPassword);
 
             const query = `INSERT INTO ADM_USER (UPDATE_USER,NAME, LASTNAME, EMAIL, PHONE, USERNAME, ROLE_ID, PASSWORD) 
         VALUES (?,?, ?, ?, ?, ?, ?, ?)`;
 
+            console.log("insertando usuario ");
             // ejecutar la consulta y recuperar el ID del usuario creado
             const [result] = await db.query<ResultSetHeader>(query,
                 [
@@ -67,13 +67,26 @@ export class UserService {
                 ]);
 
             if (result.affectedRows === 0) {
-                return false;
+                return 0;
             }
 
-            return true;
+            console.log("Enviando correo de notificación al usuario...");
+
+
+            let body = await configService.getConfig('MAIL_USER_PASS_BODY');
+            const subject = await configService.getConfig('MAIL_USER_PASS_SUBJECT');
+            body = body?.replaceAll('{username}', userData.username.trim().toLowerCase());
+            body = body?.replaceAll('{password}', tempPassword);
+            const emailSent = await sendMail(userData.email.trim().toLowerCase(), token, subject, body);
+
+            if (!emailSent) {
+                console.error("Error al enviar el correo de notificación.");
+                return -1; // Indicar que hubo un error al enviar el correo
+            }
+            return 1;
         } catch (error) {
             console.error("Error al crear el usuario:", error);
-            return false;
+            return 0;
         }
     }
 
@@ -124,7 +137,7 @@ export class UserService {
     }
 
 
-    async resetPassword(userId: number, currentUserId: number): Promise<boolean> {
+    async resetPassword(userId: number, currentUserId: number, username: string, email: string, token: string): Promise<number> {
         try {
             // Generar una contraseña temporal
             const tempPassword = Math.random().toString(36).slice(-8); // Genera una cadena aleatoria de 8 caracteres
@@ -139,12 +152,24 @@ export class UserService {
         WHERE USER_ID = ?`;
             const [result] = await db.query<ResultSetHeader>(query, [hashedPassword, currentUserId, userId]);
             if (result.affectedRows === 0) {
-                return false;
+                return 0;
             }
-            return true;
+
+
+            let body = await configService.getConfig('MAIL_USER_RESET_BODY');
+            const subject = await configService.getConfig('MAIL_USER_RESET_SUBJECT');
+            body = body?.replaceAll('{username}', username);
+            body = body?.replaceAll('{password}', tempPassword);
+            const emailSent = await sendMail(email, token, subject, body);
+
+            if (!emailSent) {
+                console.error("Error al enviar el correo de notificación.");
+                return -1; // Indicar que hubo un error al enviar el correo
+            }
+            return 1;
         } catch (error) {
             console.error("Error al reiniciar la contraseña:", error);
-            return false;
+            return 0;
         }
     }
 }

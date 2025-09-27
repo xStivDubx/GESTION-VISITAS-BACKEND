@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/user.service';
 import { RoleService } from '../services/role.service';
+import { ConfigService } from '../services/config.service';
 
 const userService = new UserService();
 const roleService = new RoleService();
+const configService = new ConfigService();
 
 export class AppController {
 
@@ -91,11 +93,16 @@ export class AppController {
             }
 
             console.log("Creando usuario");
-            const result = await userService.createUser(currentUser.userId, { name, lastname, email, phone, username, roleId });
-            if (result) {
+            const token = req.headers['authorization']?.split(' ')[1];
+            const result = await userService.createUser(currentUser.userId, token, { name, lastname, email, phone, username, roleId });
+            if (result === 1) {
                 res.status(200).json({ message: "Usuario creado exitosamente" });
-            } else {
+            }
+            if (result === 0) {
                 res.status(500).json({ message: "No fue posible crear el usuario, favor intente más tarde" });
+            }
+            if (result === -1) {
+                res.status(500).json({ message: "Usuario creado pero no fue posible enviar el correo de notificación" });
             }
 
         } catch (error) {
@@ -225,12 +232,15 @@ export class AppController {
                 return res.status(404).json({ message: "Usuario no encontrado" });
             }
             console.log("Reiniciando contraseña de usuario");
-            const result = await userService.resetPassword(userId, currentUser.userId);
-            if (result) {
+            const result = await userService.resetPassword(userId, currentUser.userId, user.username, user.email, req.headers['authorization']?.split(' ')[1]);
+            if (result === 1) {
                 res.status(200).json({ message: "Contraseña reiniciada exitosamente" });
             }
-            else {
+            if (result === 0) {
                 res.status(500).json({ message: "No fue posible reiniciar la contraseña, favor intente más tarde" });
+            }
+            if (result === -1) {
+                res.status(500).json({ message: "Contraseña reiniciada pero no fue posible enviar el correo de notificación" });
             }
         } catch (error) {
             console.error("Error en el proceso de reinicio de contraseña de usuario:", error);

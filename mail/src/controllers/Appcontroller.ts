@@ -11,8 +11,6 @@ export class AppController {
             console.log("Iniciando proceso de envio de correos...");
             const { sendMail, mailPassword,emailReceptor, subject, body } = req.body;
 
-            console.log("Datos recibidos:", { emailReceptor, subject, body });
-
             if(!sendMail || !mailPassword || !emailReceptor || !subject || !body) {
                 return res.status(400).json({ message: "Faltan datos en la solicitud" });
             }
@@ -31,7 +29,7 @@ export class AppController {
             const mailOptions = {
                 to: emailReceptor,
                 subject: subject,
-                text: body
+                html: body
             };
 
 
