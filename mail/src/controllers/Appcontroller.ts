@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import { ConfigService } from '../services/config.service';
 import nodemailer from 'nodemailer';
-const configService = new ConfigService();
 
 export class AppController {
 
@@ -11,25 +9,20 @@ export class AppController {
     sendMail = async (req: Request, res: Response) => {
         try {
             console.log("Iniciando proceso de envio de correos...");
-            const { emailReceptor, subject, body } = req.body;
+            const { sendMail, mailPassword,emailReceptor, subject, body } = req.body;
 
             console.log("Datos recibidos:", { emailReceptor, subject, body });
-            
-            if(!emailReceptor || !subject || !body) {
+
+            if(!sendMail || !mailPassword || !emailReceptor || !subject || !body) {
                 return res.status(400).json({ message: "Faltan datos en la solicitud" });
             }
-
-            console.log("Obteniendo configuraciones de correo...");
-            const smtpUser= await configService.getConfig('SEND_MAIL_EMAIL');
-            const smtpPass= await configService.getConfig('SEND_MAIL_PASSWORD_APP');
-           
 
             console.log("configurando el transporte de correo...");
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
-                    user: smtpUser,
-                    pass: smtpPass
+                    user: sendMail,
+                    pass: mailPassword
                 }
             });
 
