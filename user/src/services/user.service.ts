@@ -16,6 +16,13 @@ export class UserService {
         return rows as any[];
     }
 
+    async getAllTechnicalUsers(userId: number): Promise<any[]> {
+        const query = await configService.getConfig('QUERY_USER_GETALL_TECHNICAL');
+        if (!query) throw new Error('No se encontró la configuración para QUERY_USER_GETALL_TECHNICAL');
+        const [rows] = await db.query<RowDataPacket[]>(query, [userId, userId]);
+        return rows as any[];
+    }
+
 
     async getUserById(userId: number): Promise<any | null> {
         const query = await configService.getConfig('QUERY_USER_GETBYID');

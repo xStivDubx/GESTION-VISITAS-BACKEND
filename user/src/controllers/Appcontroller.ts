@@ -37,6 +37,16 @@ export class AppController {
         }
     }
 
+    getAllTechnicalUsers = async (req: Request, res: Response) => {
+        try {
+            const userId = Number(req.params.userId);
+            const users = await userService.getAllTechnicalUsers(userId);
+            return res.status(200).json({ data: users });
+        } catch (error) {
+            console.error("Error en el proceso de obtención de usuarios técnicos:", error);
+            res.status(500).json({ message: "Ocurrió un error en el proceso de obtención de usuarios técnicos", error: error.message });
+        }
+    }
 
     saveUser = async (req: Request, res: Response) => {
         const { name, lastname, email, phone, username, roleId } = req.body;
@@ -248,4 +258,7 @@ export class AppController {
         }
 
     }
+
+
+    
 }

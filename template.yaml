@@ -109,6 +109,11 @@ Resources:
           Properties:
             Path: /user/{id}
             Method: get
+        GetAllTechnicalUsers:
+          Type: Api
+          Properties:
+            Path: /user/technical/{userId}
+            Method: get
         CreateUser:
           Type: Api
           Properties:

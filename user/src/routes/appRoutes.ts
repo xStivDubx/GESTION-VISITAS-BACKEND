@@ -7,6 +7,7 @@ const controller = new AppController();
 
 
 router.get('/', controller.getAllUsers);
+router.get('/technical/:userId', controller.getAllTechnicalUsers);
 router.get('/:id', controller.getUserById);
 router.post('/save', controller.saveUser);
 router.put('/update', controller.updateUser);
