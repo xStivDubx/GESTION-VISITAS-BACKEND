@@ -134,6 +134,11 @@ Resources:
           Properties:
             Path: /user/reset-password
             Method: put
+        AssignTechnical:
+          Type: Api
+          Properties:
+            Path: /user/assign-technical
+            Method: post
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
