@@ -242,6 +242,31 @@ Resources:
           Properties:
             Path: /client/delete
             Method: put
+        GetSitesByClientId:
+          Type: Api
+          Properties:
+            Path: /client/sites-by-client/{id}
+            Method: get
+        GetSiteBySiteId:
+          Type: Api
+          Properties:
+            Path: /client/site/{id}
+            Method: get
+        CreateSite:
+          Type: Api
+          Properties:
+            Path: /client/site/save
+            Method: post
+        UpdateSite:
+          Type: Api
+          Properties:
+            Path: /client/site/update
+            Method: put
+        DeleteSite:
+          Type: Api
+          Properties:
+            Path: /client/site/delete
+            Method: put
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -250,7 +275,7 @@ Resources:
         Sourcemap: false
         EntryPoints:
           - index.ts
-          
+
 
 
 # Outputs define las salidas que se mostrarán al finalizar el despliegue
