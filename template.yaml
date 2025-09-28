@@ -206,6 +206,53 @@ Resources:
           - index.ts
           
 
+  ClientFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: client/
+      Handler: index.handler
+      Environment:
+        Variables:
+          DB_URL: !Ref dbUrl
+          JWT_SECRET: !Ref jwtSecret
+          JWT_EXPIRES_IN: !Ref jwtExpiresIn
+      Events:
+        GetAllClients:
+          Type: Api
+          Properties: 
+            Path: /client/
+            Method: get
+        GetClientById:
+          Type: Api
+          Properties:
+            Path: /client/{id}
+            Method: get
+        CreateClient:
+          Type: Api
+          Properties:
+            Path: /client/save
+            Method: post
+        UpdateClient:
+          Type: Api
+          Properties:
+            Path: /client/update
+            Method: put
+        DeleteClient:
+          Type: Api
+          Properties:
+            Path: /client/delete
+            Method: put
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2022"
+        Sourcemap: false
+        EntryPoints:
+          - index.ts
+          
+
+
 # Outputs define las salidas que se mostrarán al finalizar el despliegue
 Outputs:
   ProjectEndpoint:

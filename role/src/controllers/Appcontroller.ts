@@ -11,7 +11,7 @@ export class AppController {
     async getAllRoles(req: Request, res: Response): Promise<Response> {
         try {
             const roles = await roleService.getAllRoles();
-            return res.status(200).json(roles);
+            return res.status(200).json({ data: roles });
         } catch (error) {
             return res.status(500).json({
                 message: "Error al obtener los roles",
@@ -27,7 +27,7 @@ export class AppController {
             if (!role) {
                 return res.status(404).json({ message: "Rol no encontrado" });
             }
-            return res.status(200).json(role);
+            return res.status(200).json({ data: role });
         } catch (error) {
             return res.status(500).json({
                 message: "Error al obtener el rol",
@@ -43,7 +43,7 @@ export class AppController {
             if (!permissions) {
                 return res.status(404).json({ message: "Permisos no encontrados" });
             }
-            return res.status(200).json(permissions);
+            return res.status(200).json({ data: permissions });
         } catch (error) {
             return res.status(500).json({
                 message: "Error al obtener los permisos",
