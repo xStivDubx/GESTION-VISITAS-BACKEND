@@ -195,7 +195,7 @@ Resources:
           Type: Api
           Properties:
             Path: /role/delete
-            Method: delete
+            Method: put
     Metadata:
       BuildMethod: esbuild
       BuildProperties:

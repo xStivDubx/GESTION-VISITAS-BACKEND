@@ -92,10 +92,7 @@ export class AppController {
                 return res.status(400).json({ message: "Faltan parámetros obligatorios" });
             }
 
-            //validar que el rol no sea 1, 2 o 3 (admin, supervisor, tecnico)
-            if (roleId === 1 || roleId === 2 || roleId === 3) {
-                return res.status(400).json({ message: "No es posible eliminar este rol por funcionalidad del sistema" });
-            }
+            
 
             // Verificar si el rol existe
             const existingRole = await roleService.findRoleById(roleId);
