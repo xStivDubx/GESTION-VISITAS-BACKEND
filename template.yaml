@@ -277,6 +277,36 @@ Resources:
           - index.ts
 
 
+  technicalVisitFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: technical-visit/
+      Handler: index.handler
+      Environment:
+        Variables:
+          DB_URL: !Ref dbUrl
+          JWT_SECRET: !Ref jwtSecret
+          JWT_EXPIRES_IN: !Ref jwtExpiresIn
+      Events:
+        GetAllTechnicalVisits:
+          Type: Api
+          Properties:
+            Path: /technical-visit/
+            Method: get
+        GetTechnicalVisitById:
+          Type: Api
+          Properties:
+            Path: /technical-visit/{id}
+            Method: get
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2022"
+        Sourcemap: false
+        EntryPoints:
+          - index.ts
+          
 
 # Outputs define las salidas que se mostrarán al finalizar el despliegue
 Outputs:
