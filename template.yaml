@@ -307,6 +307,37 @@ Resources:
         EntryPoints:
           - index.ts
           
+  configVisitFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: config-visit/
+      Handler: index.handler
+      Environment:
+        Variables:
+          DB_URL: !Ref dbUrl
+          JWT_SECRET: !Ref jwtSecret
+          JWT_EXPIRES_IN: !Ref jwtExpiresIn
+      Events:
+        GetTechniciansBySupervisor:
+          Type: Api
+          Properties:
+            Path: /config-visit/technicians-by-supervisor/{id}
+            Method: get
+        GetClientsActive:
+          Type: Api
+          Properties:
+            Path: /config-visit/clients-active/
+            Method: get
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2022"
+        Sourcemap: false
+        EntryPoints:
+          - index.ts
+
+
 
 # Outputs define las salidas que se mostrarán al finalizar el despliegue
 Outputs:

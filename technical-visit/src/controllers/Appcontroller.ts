@@ -9,16 +9,16 @@ export class AppController {
         try {
             console.log("ingresando al metodo de getAllTechnicalVisits");
             //recuperar el usuario actual del middleware
-             const currentUser = res.locals.currentUser;
+            const currentUser = res.locals.currentUser;
             console.log("Usuario actual:", currentUser);
 
-            if(currentUser.roleId === 2){ //SUPERVISOR
+            if (currentUser.roleId === 2) { //SUPERVISOR
                 console.log("listando todas las visitas tecnicas - supervisor");
                 const visits = await visitService.getAllTechnicalVisitsBySupervisor(currentUser.userId);
                 return res.status(200).json({ data: visits });
             }
 
-            if(currentUser.roleId === 3){ //TECNICO
+            if (currentUser.roleId === 3) { //TECNICO
                 console.log("listando todas las visitas tecnicas - tecnico");
                 const visits = await visitService.getAllTechnicalVisitsByTechnician(currentUser.userId);
                 return res.status(200).json({ data: visits });
@@ -29,7 +29,7 @@ export class AppController {
             return res.status(200).json({ data: clients });
         } catch (error) {
             console.error("Error al obtener los clientes:", error);
-            return res.status(500).json({ message: "Error interno del servidor", error:error.message });
+            return res.status(500).json({ message: "Error interno del servidor", error: error.message });
         }
     }
 
@@ -48,9 +48,11 @@ export class AppController {
             return res.status(200).json({ data: visit });
         } catch (error) {
             console.error("Error al obtener la visita técnica:", error);
-            return res.status(500).json({ message: "Error interno del servidor", error:error.message  });
+            return res.status(500).json({ message: "Error interno del servidor", error: error.message });
         }
     }
+
+
 
 
 

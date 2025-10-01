@@ -33,7 +33,6 @@ export class UserService {
 
         const [rows] = await db.query<RowDataPacket[]>(query, [username]);
 
-        console.log("Filas obtenidas:", rows);
         if (rows.length === 0) return null;
         return rows;
     }
@@ -53,7 +52,6 @@ SELECT
   `;
 
         const [rows] = await db.query<RowDataPacket[]>(query, [userId]);
-        console.log("Filas obtenidas:", rows);
         if (rows.length === 0) return null;
         return rows;
     }
