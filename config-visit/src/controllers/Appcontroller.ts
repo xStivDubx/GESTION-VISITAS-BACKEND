@@ -210,6 +210,11 @@ export class AppController {
                 return res.status(404).json({ message: `No existe la visita tecnica con ID '${visitId}'` });
             }
 
+            //validar que solo se pueda actualizar con estado 1 
+            if (existingVisitById.STATUS !== 1) {
+                return res.status(400).json({ message: `La visita tecnica no puede ser actualizada, debido a que su estado es diferente de '1 - Programada'` });
+            }
+
             //VALIDAR SI LA SEDE Y EL CLIENTE ESTAN ACTIVOS
             console.log("validando si la sede y el cliente estan activos");
             const client = await clientService.getClientByLocation(siteId);
@@ -246,9 +251,33 @@ export class AppController {
                 return res.status(500).json({ message: "No fue posible actualizar la visita tecnica, favor de intentar nuevamente" });
             }
             console.log("Visita tecnica actualizada exitosamente");
+
+            //enviar correo al cliente notificando la creacion de la visita tecnica - pendiente
+
+            console.log("enviando correo de notificacion al cliente sobre la actualizacion de la visita tecnica");
+            const emailReceptor = client.email;
+            const token = req.headers['authorization']?.split(' ')[1];
+            let body = await configService.getConfig('MAIL_UPDATE_VISIT_BODY_CLIENT');
+            const subject = await configService.getConfig('MAIL_UPDATE_VISIT_SUBJECT_CLIENT');
+
+            body = body?.replaceAll('{clientName}', client.client_name);
+            body = body?.replaceAll('{siteName}', client.site_name);
+            body = body?.replaceAll('{visitDate}', visitDate);
+            body = body?.replaceAll('{technicianName}', technician.name + ' ' + technician.lastname);
+            body = body?.replaceAll('{processDescription}', description);
+
+            const emailSent = await sendMail(emailReceptor, token!, subject!, body!);
+            if (!emailSent) {
+                return res.status(200).json({ message: "Visita tecnica actualizada exitosamente. Sin embargo, no fue posible enviar el correo de notificación al cliente." });
+            }
+
+
+
+
             return res.status(200).json({ message: "Visita tecnica actualizada exitosamente" });
 
 
+            
 
         } catch (error) {
             console.error("Error al actualizar la visita tecnica:", error);

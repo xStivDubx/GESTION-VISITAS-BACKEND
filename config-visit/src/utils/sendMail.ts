@@ -10,14 +10,7 @@ export async function sendMail(emailReceptor: string, token:string,subject:strin
         const emailPass = await configService.getConfig('SEND_MAIL_PASSWORD_APP');
         const endpoint = await configService.getConfig('SEND_MAIL_ENDPOINT');
 
-        console.log("Enviando correo a:", emailReceptor);
-        console.log("Contenido del correo:", body);
-        console.log("Asunto del correo:", subject);
-
-        console.log("Usando endpoint:", endpoint);
-        console.log("Credenciales de correo:", { emailUser, emailPass });
-        
-
+        console.time("sendMail");
         await axios.post(endpoint, {
             "sendMail": emailUser,
             "mailPassword": emailPass,
@@ -30,6 +23,7 @@ export async function sendMail(emailReceptor: string, token:string,subject:strin
                 'Content-Type': 'application/json'
             }
         });
+        console.timeEnd("sendMail");
 
         return true;
     } catch (error) {
