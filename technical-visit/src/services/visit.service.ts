@@ -44,6 +44,13 @@ export class VisitService {
         return rows as any[];
     }
 
+    async getClientByVisitId(visitId: number): Promise<any> {
+        const query = await configService.getConfig('QUERY_CLIENT_BY_VISIT_ID');
+        if (!query) throw new Error('No se encontró la configuración para QUERY_CLIENT_BY_VISIT_ID');
+        const [rows] = await db.query<RowDataPacket[]>(query, [visitId]);
+        return rows.length > 0 ? rows[0] : null;
+    }
+
     async getClientsActive(): Promise<any[]> {
         const query = await configService.getConfig('QUERY_VISIT_CLIENTS_ACTIVE');
         if (!query) throw new Error('No se encontró la configuración para QUERY_VISIT_CLIENTS_ACTIVE');

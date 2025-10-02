@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
 import { VisitService } from '../services/visit.service';
 import { AuthService } from '../services/auth.service';
+import { ConfigService } from '../services/config.service';
+import { sendMail } from '../utils/sendMail';
 
 const visitService = new VisitService();
 const authService = new AuthService();
-
+const configService = new ConfigService();
 export class AppController {
 
     async getAllTechnicalVisits(req: Request, res: Response): Promise<Response> {
@@ -121,7 +123,10 @@ export class AppController {
             }
 
             console.log("Check-in generado exitosamente");
-            
+
+
+
+
             return res.status(200).json({ message: "Check-in generado exitosamente" });
         } catch (error) {
             console.error("Error en operationCheckInVisit:", error);
@@ -135,7 +140,7 @@ export class AppController {
             console.log("ingresando al metodo de operationCheckOutVisit");
             const { visitId, technicianId, latitude, longitude, resume, materialsUsed } = req.body;
             console.log("Validando campos obligatorios");
-            if (!visitId || !technicianId || !latitude || !longitude || !resume ) {
+            if (!visitId || !technicianId || !latitude || !longitude || !resume) {
                 return res.status(400).json({ message: "Faltan campos obligatorios" });
             }
             const lat = parseFloat(latitude);
@@ -180,7 +185,41 @@ export class AppController {
                 return res.status(500).json({ message: "No fue posible realizar el check-out" });
             }
             console.log("Check-out generado exitosamente");
-            return res.status(200).json({ message: "Check-out generado exitosamente" });
+
+
+            //enviar correo 
+
+            //recuperar el cliente de la visita tecnica
+            const client = await visitService.getClientByVisitId(visitId);
+            if (!client) {
+                console.log(`No fue posible recuperar el cliente de la visita tecnica con ID '${visitId}'`);
+                return res.status(200).json({ message: "Check-out generado exitosamente, pero no fue posible enviar el correo al cliente" });
+            }
+
+            //enviar correo al cliente
+            console.log("enviando correo al cliente");
+            const emailReceptor = client.EMAIL;
+            const token = req.headers['authorization']?.split(' ')[1];
+            let body = await configService.getConfig('MAIL_RESUME_VISIT_BODY_CLIENT');
+            const subject = await configService.getConfig('MAIL_RESUME_VISIT_SUBJECT_CLIENT');
+
+
+            body = body?.replace('{clientName}', client.NAME);
+            body = body?.replace('{siteName}', client.SITE_NAME);
+            body = body?.replace('{visitId}', visitId);
+            body = body?.replace('{supervisorName}', existingVisitById.supervisorName);
+            body = body?.replace('{technicianName}', existingVisitById.technicianName);
+            body = body?.replace('{resume}', resume);
+            body = body?.replace('{materialsUsed}', materialsUsed || 'No se registraron materiales utilizados');
+            body = body?.replace('{dateVisit}', existingVisitById.visitDate);
+
+            const mailSent = await sendMail(emailReceptor, token!, subject!, body!);
+            if (!mailSent) {
+                console.log("No fue posible enviar el correo al cliente");
+                return res.status(200).json({ message: "Check-out generado exitosamente, pero no fue posible enviar el correo al cliente" });
+            }
+
+            return res.status(200).json({ message: "Check-out generado exitosamente, se envió el correo al cliente" });
         } catch (error) {
             console.error("Error en operationCheckOutVisit:", error);
             return res.status(500).json({ message: "Error interno del servidor", error: error.message });
