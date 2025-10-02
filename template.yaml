@@ -204,7 +204,34 @@ Resources:
         Sourcemap: false
         EntryPoints:
           - index.ts
-          
+
+
+  ConfigFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: configurations/
+      Handler: index.handler
+      Environment:
+        Variables:
+          DB_URL: !Ref dbUrl
+          JWT_SECRET: !Ref jwtSecret
+          JWT_EXPIRES_IN: !Ref jwtExpiresIn
+      Events:
+        GetAllConfigs:
+          Type: Api
+          Properties:
+            Path: /config/
+            Method: get
+        GetConfigById:
+          Type: Api
+          Properties:
+            Path: /config/{id}
+            Method: get
+        UpdateConfig:
+          Type: Api
+          Properties:
+            Path: /config/update
+            Method: put
 
   ClientFunction:
     Type: AWS::Serverless::Function
