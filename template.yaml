@@ -328,6 +328,21 @@ Resources:
           Properties:
             Path: /config-visit/clients-active/
             Method: get
+        GetActiveLocationsByClient:
+          Type: Api
+          Properties:
+            Path: /config-visit/active-locations-by-client/{id}
+            Method: get
+        CreateVisit:
+          Type: Api
+          Properties:
+            Path: /config-visit/create-visit
+            Method: post
+        UpdateVisit:
+          Type: Api
+          Properties:
+            Path: /config-visit/update-visit
+            Method: put
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
