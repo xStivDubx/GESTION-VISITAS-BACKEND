@@ -66,6 +66,130 @@ export class AppController {
         }
     }
 
+    async operationCheckInVisit(req: Request, res: Response): Promise<Response> {
+        try {
+            console.log("ingresando al metodo de operationCheckInVisit");
+
+            const { visitId, technicianId, latitude, longitude } = req.body;
+
+            console.log("Validando campos obligatorios");
+            if (!visitId || !technicianId || !latitude || !longitude) {
+                return res.status(400).json({ message: "Faltan campos obligatorios" });
+            }
+
+            const lat = parseFloat(latitude);
+            const lon = parseFloat(longitude);
+
+            if (isNaN(lat) || lat < -90 || lat > 90) {
+                return res.status(400).json({ message: "Latitud inválida" });
+            }
+            if (isNaN(lon) || lon < -180 || lon > 180) {
+                return res.status(400).json({ message: "Longitud inválida" });
+            }
+
+            //validar que la visita tecnica exista
+            console.log("validando que la visita tecnica exista");
+            const existingVisitById = await visitService.getVisitById(visitId);
+            if (!existingVisitById) {
+                return res.status(404).json({ message: `No existe la visita tecnica con ID '${visitId}'` });
+            }
+
+            //validar estado de la visita tecnica
+            console.log("validando estado de la visita tecnica");
+            if (existingVisitById.statusId != 1) {
+                return res.status(400).json({ message: `No es posible realizar checkIn, debido a que tiene un estado '${existingVisitById.statusDescription}'` });
+            }
+
+            //validar que el tecnico tenga asignada la visita tecnica
+            console.log("validando que el tecnico tenga asignada la visita tecnica");
+            if (existingVisitById.technicianId !== technicianId) {
+                return res.status(400).json({ message: `El tecnico con ID '${technicianId}' no tiene asignada la visita tecnica con ID '${visitId}'` });
+            }
+
+            //validar que no exista un check-in previo
+            console.log("validando que no exista un check-in previo");
+            const existsCheckIn = await visitService.validateCheckInExists(visitId);
+            if (existsCheckIn) {
+                return res.status(400).json({ message: `Ya existe un check-in para la visita técnica '${existsCheckIn.NAME}'` });
+            }
+
+            //generar check-in
+            console.log("generando check-in de la visita tecnica");
+            const resultCheckIn = await visitService.checkInVisit(visitId, lat, lon);
+            if (!resultCheckIn) {
+                return res.status(500).json({ message: "No fue posible realizar el check-in" });
+            }
+
+            console.log("Check-in generado exitosamente");
+            
+            return res.status(200).json({ message: "Check-in generado exitosamente" });
+        } catch (error) {
+            console.error("Error en operationCheckInVisit:", error);
+            return res.status(500).json({ message: "Error interno del servidor", error: error.message });
+        }
+    }
+
+
+    async operationCheckOutVisit(req: Request, res: Response): Promise<Response> {
+        try {
+            console.log("ingresando al metodo de operationCheckOutVisit");
+            const { visitId, technicianId, latitude, longitude, resume, materialsUsed } = req.body;
+            console.log("Validando campos obligatorios");
+            if (!visitId || !technicianId || !latitude || !longitude || !resume ) {
+                return res.status(400).json({ message: "Faltan campos obligatorios" });
+            }
+            const lat = parseFloat(latitude);
+            const lon = parseFloat(longitude);
+            if (isNaN(lat) || lat < -90 || lat > 90) {
+                return res.status(400).json({ message: "Latitud inválida" });
+            }
+            if (isNaN(lon) || lon < -180 || lon > 180) {
+                return res.status(400).json({ message: "Longitud inválida" });
+            }
+            //validar que la visita tecnica exista
+            console.log("validando que la visita tecnica exista");
+            const existingVisitById = await visitService.getVisitById(visitId);
+            if (!existingVisitById) {
+                return res.status(404).json({ message: `No existe la visita tecnica con ID '${visitId}'` });
+            }
+            //validar estado de la visita tecnica
+            console.log("validando estado de la visita tecnica");
+            if (existingVisitById.statusId != 2) {
+                return res.status(400).json({ message: `No es posible realizar check-out, debido a que tiene un estado '${existingVisitById.statusDescription}'` });
+            }
+            //validar que el tecnico tenga asignada la visita tecnica
+            console.log("validando que el tecnico tenga asignada la visita tecnica");
+            if (existingVisitById.technicianId !== technicianId) {
+                return res.status(400).json({ message: `El tecnico con ID '${technicianId}' no tiene asignada la visita tecnica con ID '${visitId}'` });
+            }
+            //validar que exista un check-in previo
+            console.log("validando que exista un check-in previo");
+            const existsCheckIn = await visitService.validateCheckInExists(visitId);
+            if (!existsCheckIn) {
+                return res.status(400).json({ message: `No existe un check-in para la visita técnica '${existingVisitById.NAME}'` });
+            }
+            //validar que no exista un check-out previo
+            console.log("validando que no exista un check-out previo");
+            if (existsCheckIn.CHECKOUT_DATETIME) {
+                return res.status(400).json({ message: `Ya existe un check-out para la visita técnica '${existingVisitById.NAME}'` });
+            }
+            //generar check-out
+            console.log("generando check-out de la visita tecnica");
+            const resultCheckOut = await visitService.checkOutVisit(visitId, lat, lon, resume, materialsUsed);
+            if (!resultCheckOut) {
+                return res.status(500).json({ message: "No fue posible realizar el check-out" });
+            }
+            console.log("Check-out generado exitosamente");
+            return res.status(200).json({ message: "Check-out generado exitosamente" });
+        } catch (error) {
+            console.error("Error en operationCheckOutVisit:", error);
+            return res.status(500).json({ message: "Error interno del servidor", error: error.message });
+        }
+    }
+
+
+
+
 
 
 

@@ -298,6 +298,16 @@ Resources:
           Properties:
             Path: /technical-visit/{id}
             Method: get
+        OperationCheckInVisit:
+          Type: Api
+          Properties:
+            Path: /technical-visit/check-in
+            Method: post
+        OperationCheckOutVisit:
+          Type: Api
+          Properties:
+            Path: /technical-visit/check-out
+            Method: post
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
