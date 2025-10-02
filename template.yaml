@@ -220,17 +220,17 @@ Resources:
         GetAllConfigs:
           Type: Api
           Properties:
-            Path: /config/
+            Path: /configuration/
             Method: get
         GetConfigById:
           Type: Api
           Properties:
-            Path: /config/{id}
+            Path: /configuration/{id}
             Method: get
         UpdateConfig:
           Type: Api
           Properties:
-            Path: /config/update
+            Path: /configuration/update
             Method: put
 
   ClientFunction:
