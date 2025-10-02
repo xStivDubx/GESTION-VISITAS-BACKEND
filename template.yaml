@@ -232,6 +232,14 @@ Resources:
           Properties:
             Path: /configuration/update
             Method: put
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2022"
+        Sourcemap: false
+        EntryPoints:
+          - index.ts
 
   ClientFunction:
     Type: AWS::Serverless::Function
