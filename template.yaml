@@ -26,6 +26,15 @@ Parameters:
 
 Resources:
 
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+
   MailFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -39,6 +48,7 @@ Resources:
         SendMail:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /mail/send
             Method: post
     Metadata:
@@ -66,16 +76,19 @@ Resources:
         Profile:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /auth/profile
             Method: get
         Login:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /auth/login
             Method: post
         ChangePassword:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /auth/change-password
             Method: post
     Metadata:
@@ -102,41 +115,49 @@ Resources:
         GetAllUsers:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /user/
             Method: get
         GetById:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /user/{id}
             Method: get
         GetAllTechnicalUsers:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /user/technical/{userId}
             Method: get
         CreateUser:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /user/save
             Method: post
         UpdateUser:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /user/update
             Method: put
         DeleteUser:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /user/delete
             Method: put
         ResetPassword:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /user/reset-password
             Method: put
         AssignTechnical:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /user/assign-technical
             Method: post
     Metadata:
@@ -164,36 +185,43 @@ Resources:
         GetAllRoles:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /role/
             Method: get 
         GetRoleById:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /role/{id}
             Method: get
         GetPermissionsByRoleId:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /role/permissions/{roleId}
             Method: get
         CreateRole:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /role/save
             Method: post
         UpdateRole:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /role/update
             Method: put 
         AssignPermissionToRole:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /role/assign-permission
             Method: post
         DeleteRole:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /role/delete
             Method: put
     Metadata:
@@ -220,16 +248,19 @@ Resources:
         GetAllConfigs:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /configuration/
             Method: get
         GetConfigById:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /configuration/{id}
             Method: get
         UpdateConfig:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /configuration/update
             Method: put
     Metadata:
@@ -254,52 +285,62 @@ Resources:
       Events:
         GetAllClients:
           Type: Api
-          Properties: 
+          Properties:
+            RestApiId: !Ref ApiGateway
             Path: /client/
             Method: get
         GetClientById:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /client/{id}
             Method: get
         CreateClient:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /client/save
             Method: post
         UpdateClient:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /client/update
             Method: put
         DeleteClient:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /client/delete
             Method: put
         GetSitesByClientId:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /client/sites-by-client/{id}
             Method: get
         GetSiteBySiteId:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /client/site/{id}
             Method: get
         CreateSite:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /client/site/save
             Method: post
         UpdateSite:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /client/site/update
             Method: put
         DeleteSite:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /client/site/delete
             Method: put
     Metadata:
@@ -326,21 +367,25 @@ Resources:
         GetAllTechnicalVisits:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /technical-visit/
             Method: get
         GetTechnicalVisitById:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /technical-visit/{id}
             Method: get
         OperationCheckInVisit:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /technical-visit/check-in
             Method: post
         OperationCheckOutVisit:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /technical-visit/check-out
             Method: post
     Metadata:
@@ -366,26 +411,31 @@ Resources:
         GetTechniciansBySupervisor:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /config-visit/technicians-by-supervisor/{id}
             Method: get
         GetClientsActive:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /config-visit/clients-active/
             Method: get
         GetActiveLocationsByClient:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /config-visit/active-locations-by-client/{id}
             Method: get
         CreateVisit:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /config-visit/create-visit
             Method: post
         UpdateVisit:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /config-visit/update-visit
             Method: put
     Metadata:
@@ -403,4 +453,5 @@ Resources:
 Outputs:
   ProjectEndpoint:
     Description: "API endpoint URL for dev stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+

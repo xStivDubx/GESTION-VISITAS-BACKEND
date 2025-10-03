@@ -44,8 +44,7 @@ export class UserService {
         const query = `
 SELECT 
       u.user_id       AS userId,
-      u.username      AS username,
-      u.password      AS password
+      u.username      AS username
     FROM ADM_USER u
     WHERE u.user_id = ?
       AND u.state IN (1,2)
