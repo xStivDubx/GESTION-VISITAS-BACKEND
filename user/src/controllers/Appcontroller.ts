@@ -112,7 +112,7 @@ export class AppController {
                 res.status(500).json({ message: "No fue posible crear el usuario, favor intente más tarde" });
             }
             if (result === -1) {
-                res.status(500).json({ message: "Usuario creado pero no fue posible enviar el correo de notificación" });
+                res.status(200).json({ message: "Usuario creado pero no fue posible enviar el correo de notificación" });
             }
 
         } catch (error) {
