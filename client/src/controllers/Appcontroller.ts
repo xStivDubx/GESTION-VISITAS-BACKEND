@@ -41,11 +41,11 @@ export class AppController {
 
 
     async createClient(req: Request, res: Response): Promise<Response> {
-        const { name, concatName, email, phone } = req.body;
+        const { name, contactName, email, phone } = req.body;
         try {
             const currentUser = res.locals.currentUser;
 
-            if (!name || !concatName || !email || !phone) {
+            if (!name || !contactName || !email || !phone) {
                 return res.status(400).json({ message: "Faltan datos obligatorios" });
             }
 
@@ -66,7 +66,7 @@ export class AppController {
                 return res.status(409).json({ message: "El cliente ya existe" });
             }
 
-            const result = await clientService.createClient(name, concatName, email, phone, currentUser.userId);
+            const result = await clientService.createClient(name, contactName, email, phone, currentUser.userId);
             if (result === 0) {
                 return res.status(500).json({ message: "Error al crear el cliente" });
             }
@@ -81,12 +81,12 @@ export class AppController {
     }
 
     async updateClient(req: Request, res: Response): Promise<Response> {
-        const { clientId, name, concatName, email, phone } = req.body;
+        const { clientId, name, contactName, email, phone } = req.body;
 
         try {
             const currentUser = res.locals.currentUser;
 
-            if (!clientId || !name || !concatName || !email || !phone) {
+            if (!clientId || !name || !contactName || !email || !phone) {
                 return res.status(400).json({ message: "Faltan parámetros obligatorios" });
             }
 
@@ -113,7 +113,7 @@ export class AppController {
                 return res.status(409).json({ message: "Ya existe un cliente con el mismo nombre" });
             }
 
-            const result = await clientService.updateCliente(clientId, name, concatName, email, phone, currentUser.userId);
+            const result = await clientService.updateCliente(clientId, name, contactName, email, phone, currentUser.userId);
             if (result === 0) {
                 return res.status(400).json({ message: "Error al actualizar el cliente" });
             }

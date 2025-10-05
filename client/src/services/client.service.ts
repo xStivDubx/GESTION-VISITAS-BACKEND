@@ -29,14 +29,14 @@ export class ClientService {
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async createClient(name: string, concatName: string, email: string, phone: string, currentUserId: number): Promise<number> {
+    async createClient(name: string, contatName: string, email: string, phone: string, currentUserId: number): Promise<number> {
 
         try {
             const query = `
         INSERT INTO CAT_CLIENT (UPDATE_USER, NAME, CONTACT_NAME, EMAIL, PHONE) 
         VALUES (?, ?, ?, ?, ?)`;
 
-            const [result] = await db.query<ResultSetHeader>(query, [currentUserId, name.trim(), concatName.trim(), email.trim(), phone.trim()]);
+            const [result] = await db.query<ResultSetHeader>(query, [currentUserId, name.trim(), contatName.trim(), email.trim(), phone.trim()]);
             if (result.affectedRows === 0) {
                 return 0;
             }
@@ -47,12 +47,12 @@ export class ClientService {
         }
     }
 
-    async updateCliente(clientId: number, name: string, concatName: string, email: string, phone: string, currentUserId: number): Promise<number> {
+    async updateCliente(clientId: number, name: string, contatName: string, email: string, phone: string, currentUserId: number): Promise<number> {
         try {
             const query = `UPDATE CAT_CLIENT 
             SET UPDATE_USER = ?, NAME = ?, CONTACT_NAME = ?, EMAIL = ?, PHONE = ?
             WHERE CLIENT_ID = ?`;
-            const [result] = await db.query<ResultSetHeader>(query, [currentUserId, name, concatName, email, phone, clientId]);
+            const [result] = await db.query<ResultSetHeader>(query, [currentUserId, name, contatName, email, phone, clientId]);
             if (result.affectedRows === 0) {
                 return 0;
             }
