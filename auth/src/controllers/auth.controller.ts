@@ -53,14 +53,15 @@ export class AuthController {
 
             console.log("generando token");
             const token = createToken(user[0].userId, user[0].roleId);
-            const changePassword = user[0].state === 2;
+            const changePassword = user[0].state == 2;
+            console.log("changePassword:", changePassword);
 
             console.log("autenticación exitosa");
             return res.status(200).json({
                 message: "Autenticación exitosa",
                 data: {
                     username: user[0].username,
-                    changePassword: changePassword,
+                    resetPassword: changePassword,
                     token: token
                 }
             });
@@ -74,6 +75,7 @@ export class AuthController {
     changePassword = async (req: Request, res: Response) => {
 
         try {
+            console.log("Iniciando proceso de cambio de contraseña");
             const { currentPassword, newPassword } = req.body;
             const currentUser = res.locals.currentUser;
             console.log("validando parametros enviados");
@@ -83,6 +85,7 @@ export class AuthController {
                 return;
             }
 
+            console.log("validando que las contraseñas sean diferentes");
             //validar que sean diferentes
             if (currentPassword === newPassword) {
                 res.status(400);
@@ -90,6 +93,7 @@ export class AuthController {
                 return;
             }
 
+            console.log("validando seguridad de la nueva contraseña");
             //validar que la contrseña sea alfanumerica, tenga al menos 8 caracteres, una mayuscula, una minuscula, un caracter especial
             const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
             if (!passwordRegex.test(newPassword)) {
@@ -107,6 +111,7 @@ export class AuthController {
                 res.json({ message: "Usuario no encontrado" });
                 return;
             }
+            console.log("validando contraseña actual");
             //validar la contraseña actual
             const isValid = await bcrypt.compare(currentPassword, user[0].password);
             if (!isValid) {

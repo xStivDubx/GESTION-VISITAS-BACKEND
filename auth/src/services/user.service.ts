@@ -1,36 +1,16 @@
 import { RowDataPacket } from "mysql2";
 import { db } from "../config/connection";
+import { ConfigService } from "./config.service";
 
 
-
+const configService = new ConfigService();
 export class UserService {
 
-    async findByUsername(username: string): Promise<any | null> {
-        const query = `
-            SELECT 
-                u.USER_ID       AS userId,
-                u.username      AS username,
-                u.password      AS password,
-                r.ROLE_ID       AS roleId,
-                r.name          AS roleName,
-                p.PERMISSION_ID AS permissionId,
-                p.name          AS permissionName,
-                p.icon          AS icon,
-                p.code          AS code,
-                p.route_front   AS routeFront
-            FROM ADM_USER  u
-            LEFT JOIN ADM_ROLE  r 
-            ON u.role_id = r.role_id
-            LEFT JOIN ADM_ROLE_PERMISSION rp 
-            ON r.role_id = rp.role_id
-            LEFT JOIN ADM_PERMISSION  p 
-            ON rp.permission_id = p.permission_id
-            WHERE u.username = ?
-            AND u.state IN (1,2)
-            AND p.state = 1
-            ORDER BY p.name ASC
-        `;
-
+    async findByUsername(username: string): Promise<any> {
+        const query = await configService.getConfig('QUERY_FIND_BY_USER');
+        if (!query) {
+            throw new Error("No se encontró la configuración para 'QUERY_USER_BY_USERNAME'");
+        }
         const [rows] = await db.query<RowDataPacket[]>(query, [username]);
 
         if (rows.length === 0) return null;
@@ -39,20 +19,25 @@ export class UserService {
 
 
 
-    async findById(userId: number): Promise<any | null> {
-      console.log("findById userId:", userId);
-        const query = `
-SELECT 
-      u.user_id       AS userId,
-      u.username      AS username
-    FROM ADM_USER u
-    WHERE u.user_id = ?
-      AND u.state IN (1,2)
-  `;
 
-        const [rows] = await db.query<RowDataPacket[]>(query, [userId]);
-        if (rows.length === 0) return null;
-        return rows;
+
+    async findById(userId: number): Promise<any | null> {
+        try {
+            console.log("findById userId:", userId);
+
+            const query = await configService.getConfig('QUERY_FIND_USER_BY_ID');
+            if (!query) {
+                throw new Error("No se encontró la configuración para 'QUERY_FIND_USER_BY_ID'");
+            }
+            const [rows] = await db.query<RowDataPacket[]>(query, [userId]);
+            if (rows.length === 0) return null;
+
+            return rows;
+        } catch (error) {
+            console.error("Error en findById:", error);
+            return null;
+        }
+
     }
 
 
