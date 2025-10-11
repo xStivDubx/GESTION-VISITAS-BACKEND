@@ -17,6 +17,20 @@ export class VisitService {
         return rows as any[];
     }
 
+    async getSupervisors(): Promise<any[]> {
+        const query = await configService.getConfig('QUERY_SUPERVISORS_VISIT');
+        if (!query) throw new Error('No se encontró la configuración para QUERY_SUPERVISORS_VISIT');
+        const [rows] = await db.query<RowDataPacket[]>(query);
+        return rows as any[];
+    }
+
+    async getSupervisorsById(supervisorId: number): Promise<any[]> {
+        const query = await configService.getConfig('QUERY_SUPERVISORS_VISIT_BY_ID');
+        if (!query) throw new Error('No se encontró la configuración para QUERY_SUPERVISORS_VISIT_BY_ID');
+        const [rows] = await db.query<RowDataPacket[]>(query, [supervisorId]);
+        return rows as any[];
+    }
+
     //validar si el tecnico esta activo y asignado al supervisor
     async validateTechnicianActive(technicianId: number): Promise<any | null> {
         const query = `select 

@@ -10,6 +10,40 @@ const configService = new ConfigService();
 
 export class AppController {
 
+    async getSupervisors(req: Request, res: Response): Promise<Response> {
+        try {
+            console.log("ingresando al metodo de getSupervisors");
+            //recuperar el usuario actual del middleware
+            const currentUser = res.locals.currentUser;
+            console.log("Usuario actual:", currentUser);
+
+            //validar el rol del usuario, si es admin (1) puede ver todos los supervisores
+            if (currentUser.roleId == 1) {
+                console.log("El usuario es admin, puede ver todos los supervisores");
+                const supervisors = await visitService.getSupervisors();
+                //validar que tenga supervisores
+                if (supervisors.length === 0) {
+                    return res.status(404).json({ message: "No se encontraron supervisores" });
+                }
+                return res.status(200).json({ data: supervisors });
+
+            } else if (currentUser.roleId == 2) {
+                console.log("El usuario es supervisor, puede ver solo su información");
+                //si es supervisor (2) puede ver solo su informacion
+                const supervisors = await visitService.getSupervisorsById(currentUser.id);
+                if (supervisors.length === 0) {
+                    return res.status(404).json({ message: "No se encontró supervisores" });
+                }
+                return res.status(200).json({ data: supervisors });
+            }
+            return res.status(403).json({ message: "No tienes permiso para ver los supervisores" });
+
+        } catch (error) {
+            console.error("Error al obtener los supervisores:", error);
+            return res.status(500).json({ message: "Error interno del servidor", error: error.message });
+        }
+    }
+
     //listar tecnicos asignados al supervisor
     async getTechniciansBySupervisor(req: Request, res: Response): Promise<Response> {
         const supervisorId = parseInt(req.params.id, 10);
@@ -277,7 +311,7 @@ export class AppController {
             return res.status(200).json({ message: "Visita tecnica actualizada exitosamente" });
 
 
-            
+
 
         } catch (error) {
             console.error("Error al actualizar la visita tecnica:", error);
