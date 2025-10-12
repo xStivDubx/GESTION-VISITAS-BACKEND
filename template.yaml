@@ -456,6 +456,12 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /config-visit/update-visit
             Method: put
+        CancelVisit:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /config-visit/cancel-visit
+            Method: put
     Metadata:
       BuildMethod: esbuild
       BuildProperties:

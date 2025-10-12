@@ -16,6 +16,7 @@ export class VisitService {
         const [rows] = await db.query<RowDataPacket[]>(query, [supervisorId]);
         return rows as any[];
     }
+    
 
     async getSupervisors(): Promise<any[]> {
         const query = await configService.getConfig('QUERY_SUPERVISORS_VISIT');
@@ -107,5 +108,11 @@ export class VisitService {
             console.error("Error al actualizar la visita tecnica:", error);
             return 0;
         }
+    }
+
+    async updateVisitStatus(visitId: number, statusId: number): Promise<number> {
+        const query = `UPDATE TRA_VISIT SET STATUS = ? WHERE VISIT_ID = ?`;
+        const [result] = await db.query<ResultSetHeader>(query, [statusId, visitId]);
+        return result.affectedRows;
     }
 }

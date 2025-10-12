@@ -12,5 +12,6 @@ router.get('/clients-active', controller.getClientsActive);
 router.get('/active-locations-by-client/:id', controller.getActiveLocationsByClient);
 router.post('/create-visit', controller.createVisitTechnical);
 router.put('/update-visit', controller.updateVisitTechnical);
+router.put('/cancel-visit', controller.cancelVisitTechnical);
 
 export default router;

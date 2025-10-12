@@ -264,9 +264,17 @@ export class AppController {
             }
 
             //validar que solo se pueda actualizar con estado 1 
-            if (existingVisitById.STATUS !== 1) {
-                return res.status(400).json({ message: `La visita tecnica no puede ser actualizada, debido a que su estado es diferente de '1 - Programada'` });
+
+            //validar que solo se pueda actualizar con estados:
+            let statusValidate = await configService.getConfig('STATUS_ALLOWED_FOR_UPDATE');
+            if (!statusValidate) {
+                return res.status(500).json({ message: "No fue posible validar el estado de la visita tecnica, favor de intentar nuevamente" });
             }
+            if (!statusValidate.includes(existingVisitById.STATUS)) {
+                return res.status(400).json({ message: `No es posible actualizar la visita técnica, por el estado en el que se encuentra.` });
+            }
+
+
 
             //VALIDAR SI LA SEDE Y EL CLIENTE ESTAN ACTIVOS
             console.log("validando si la sede y el cliente estan activos");
@@ -334,6 +342,42 @@ export class AppController {
 
         } catch (error) {
             console.error("Error al actualizar la visita tecnica:", error);
+            return res.status(500).json({ message: "Error interno del servidor", error: error.message });
+        }
+    }
+
+    async cancelVisitTechnical(req: Request, res: Response): Promise<Response> {
+        try {
+            console.log("ingresando al metodo de cancelVisitTechnical");
+            const { visitId } = req.body;
+            //validar que los campos obligatorios esten presentes
+            if (!visitId) {
+                return res.status(400).json({ message: "Faltan campos obligatorios" });
+            }
+            //validar si ya existe la visita tecnica por ID
+            const existingVisitById = await visitService.getVisitById(visitId);
+            if (!existingVisitById) {
+                return res.status(404).json({ message: `No existe la visita tecnica con ID '${visitId}'` });
+            }
+            //validar que solo se pueda actualizar con estados:
+            let statusValidate = await configService.getConfig('STATUS_ALLOWED_FOR_CANCEL_VISIT');
+            if (!statusValidate) {
+                return res.status(500).json({ message: "No fue posible validar el estado de la visita tecnica, favor de intentar nuevamente" });
+            }
+            if (!statusValidate.includes(existingVisitById.STATUS)) {
+                return res.status(400).json({ message: `No es posible cancelar la visita tecnica, por el estado en el que se encuentra.` });
+            }
+            //cancelar la visita tecnica
+            console.log("cancelando la visita tecnica");
+            const resultUpdate = await visitService.updateVisitStatus(visitId, 5);
+            if (resultUpdate === 0) {
+                return res.status(500).json({ message: "No fue posible cancelar la visita tecnica, favor de intentar nuevamente" });
+            }
+            console.log("Visita tecnica cancelada exitosamente");
+
+            return res.status(200).json({ message: "Visita tecnica cancelada exitosamente" });
+        } catch (error) {
+            console.error("Error al cancelar la visita tecnica:", error);
             return res.status(500).json({ message: "Error interno del servidor", error: error.message });
         }
     }
