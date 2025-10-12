@@ -44,6 +44,25 @@ export class AppController {
         }
     }
 
+
+    async getVisitById(req: Request, res: Response): Promise<Response> {
+        const visitId = parseInt(req.params.id, 10);
+        try {
+            console.log("ingresando al metodo de getVisitById");
+            if (isNaN(visitId)) {
+                return res.status(400).json({ message: "ID de visita inválido" });
+            }
+            const visit = await visitService.getVisitById(visitId);
+            if (!visit) {
+                return res.status(404).json({ message: `No se encontró la visita técnica con ID ${visitId}` });
+            }
+            return res.status(200).json({ data: visit });
+        } catch (error) {
+            console.error("Error al obtener la visita técnica:", error);
+            return res.status(500).json({ message: "Error interno del servidor", error: error.message });
+        }
+    }
+
     //listar tecnicos asignados al supervisor
     async getTechniciansBySupervisor(req: Request, res: Response): Promise<Response> {
         const supervisorId = parseInt(req.params.id, 10);

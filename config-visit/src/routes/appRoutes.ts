@@ -5,6 +5,7 @@ const router = Router();
 
 const controller = new AppController();
 
+router.get('/visit/:id', controller.getVisitById);
 router.get('/supervisors', controller.getSupervisors);
 router.get('/technicians-by-supervisor/:id', controller.getTechniciansBySupervisor);
 router.get('/clients-active', controller.getClientsActive);

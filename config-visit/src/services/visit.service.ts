@@ -48,7 +48,9 @@ export class VisitService {
 
     //buscar visita tecnica por id
     async getVisitById(visitId: number): Promise<any> {
-        const query = `SELECT * FROM TRA_VISIT WHERE VISIT_ID = ?`;
+
+        const query = await configService.getConfig('QUERY_CONFIG_VISIT_BY_ID');
+        if (!query) throw new Error('No se encontró la configuración para QUERY_CONFIG_VISIT_BY_ID');
         const [rows] = await db.query<RowDataPacket[]>(query, [visitId]);
         return rows[0] as any;
     }
