@@ -36,6 +36,12 @@ export class VisitService {
         return rows.length > 0 ? rows[0] : null;
     }
 
+    async updateStatusVisitToInProgress(visitId: number): Promise<number> {
+        const query = `UPDATE TRA_VISIT SET STATUS = 2 WHERE VISIT_ID = ?`;
+        const [result] = await db.query<ResultSetHeader>(query, [visitId]);
+        return result.affectedRows;
+    }
+
 
     async getTechniciansBySupervisor(supervisorId: number): Promise<any[]> {
         const query = await configService.getConfig('QUERY_TECHNICIANS_BY_SUPERVISOR');

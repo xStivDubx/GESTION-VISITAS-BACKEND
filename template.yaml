@@ -376,6 +376,12 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /technical-visit/{id}
             Method: get
+        UpdateStatusInitVisit:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /technical-visit/init
+            Method: post
         OperationCheckInVisit:
           Type: Api
           Properties:

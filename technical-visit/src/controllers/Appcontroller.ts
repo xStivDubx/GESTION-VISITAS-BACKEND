@@ -3,6 +3,7 @@ import { VisitService } from '../services/visit.service';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
 import { sendMail } from '../utils/sendMail';
+import { config } from 'dotenv';
 
 const visitService = new VisitService();
 const authService = new AuthService();
@@ -68,6 +69,34 @@ export class AppController {
         }
     }
 
+    async updateStatusInitVisit(req: Request, res: Response): Promise<Response> {
+        try {
+            const { visitId } = req.body;
+            if (!visitId ) {
+                return res.status(400).json({ message: "Faltan campos obligatorios" });
+            }
+            console.log("ingresando al metodo de updateStatusVisit");
+            //validar que la visita tecnica exista
+            console.log("validando que la visita tecnica exista");
+            const existingVisitById = await visitService.getVisitById(visitId);
+            if (!existingVisitById) {
+                return res.status(404).json({ message: `No existe la visita tecnica con ID '${visitId}'` });
+            }
+            //actualizar el estado de la visita tecnica
+            console.log("actualizando el estado de la visita tecnica");
+            const resultUpdate = await visitService.updateStatusVisitToInProgress(visitId);
+            if (!resultUpdate) {
+                return res.status(500).json({ message: "No fue posible actualizar el estado de la visita técnica" });
+            }
+            console.log("Estado de la visita técnica actualizado exitosamente");
+            return res.status(200).json({ message: "Estado de la visita técnica actualizado exitosamente" });
+        } catch (error) {
+            console.error("Error en updateStatusVisit:", error);
+            return res.status(500).json({ message: "Error interno del servidor", error: error.message });
+        }
+
+    }
+
     async operationCheckInVisit(req: Request, res: Response): Promise<Response> {
         try {
             console.log("ingresando al metodo de operationCheckInVisit");
@@ -98,7 +127,12 @@ export class AppController {
 
             //validar estado de la visita tecnica
             console.log("validando estado de la visita tecnica");
-            if (existingVisitById.statusId != 1) {
+            let statusValidate = await configService.getConfig('STATUS_ALLOWED_CHECKIN');
+            if (!statusValidate) {
+                console.log("No se encontró la configuración STATUS_ALLOWED_CHECKIN, se usará el estado por defecto '1'");
+                statusValidate = '1'; //por defecto solo el estado 1 - asignada
+            }
+            if (!statusValidate.includes(existingVisitById.statusId)) {
                 return res.status(400).json({ message: `No es posible realizar checkIn, debido a que tiene un estado '${existingVisitById.statusDescription}'` });
             }
 
@@ -159,7 +193,12 @@ export class AppController {
             }
             //validar estado de la visita tecnica
             console.log("validando estado de la visita tecnica");
-            if (existingVisitById.statusId != 2) {
+            let statusValidate = await configService.getConfig('STATUS_ALLOWED_CHECKOUT');
+            if (!statusValidate) {
+                console.log("No se encontró la configuración STATUS_ALLOWED_CHECKOUT, se usará el estado por defecto '2'");
+                statusValidate = '2'; //por defecto solo el estado 2 - en progreso
+            }
+            if (!statusValidate.includes(existingVisitById.statusId)) {
                 return res.status(400).json({ message: `No es posible realizar check-out, debido a que tiene un estado '${existingVisitById.statusDescription}'` });
             }
             //validar que el tecnico tenga asignada la visita tecnica

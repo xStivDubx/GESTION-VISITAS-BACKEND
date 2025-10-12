@@ -8,6 +8,7 @@ const controller = new AppController();
 
 router.get('/', controller.getAllTechnicalVisits);
 router.get('/:id', controller.getTechnicalVisitById);
+router.post('/init', controller.updateStatusInitVisit);
 router.post('/check-in', controller.operationCheckInVisit);
 router.post('/check-out', controller.operationCheckOutVisit);
 
