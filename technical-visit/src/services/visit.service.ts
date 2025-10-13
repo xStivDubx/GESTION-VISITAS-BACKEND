@@ -92,7 +92,7 @@ export class VisitService {
             const [insertResult] = await connection.query<ResultSetHeader>(insertQuery, [visitId, latitude, longitude]);
 
             // Actualizar el estado de la visita técnica a '2 - EN PROCESO'
-            const updateQuery = `UPDATE TRA_VISIT SET STATUS = 2 WHERE VISIT_ID = ?`;
+            const updateQuery = `UPDATE TRA_VISIT SET STATUS = 3 WHERE VISIT_ID = ?`;
             const [updateResult] = await connection.query<ResultSetHeader>(updateQuery, [visitId]);
 
             // Verificar que ambas operaciones fueron exitosas
@@ -128,8 +128,8 @@ export class VisitService {
                 WHERE VISIT_ID = ?`;
             const [insertResult] = await connection.query<ResultSetHeader>(updateCheckout, [latitude, longitude, resume, materialsUsed, visitId]);
 
-            // Actualizar el estado de la visita técnica a '3 - FINALIZADA'
-            const updateQuery = `UPDATE TRA_VISIT SET STATUS = 3 WHERE VISIT_ID = ?`;
+            // Actualizar el estado de la visita técnica a '4 - FINALIZADA'
+            const updateQuery = `UPDATE TRA_VISIT SET STATUS = 4 WHERE VISIT_ID = ?`;
             const [updateResult] = await connection.query<ResultSetHeader>(updateQuery, [visitId]);
 
             // Verificar que ambas operaciones fueron exitosas

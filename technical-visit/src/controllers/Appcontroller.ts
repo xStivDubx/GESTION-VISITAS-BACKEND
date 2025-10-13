@@ -82,6 +82,15 @@ export class AppController {
             if (!existingVisitById) {
                 return res.status(404).json({ message: `No existe la visita tecnica con ID '${visitId}'` });
             }
+
+             let statusValidate = await configService.getConfig('STATUS_ALLOWED_INIT');
+            if (!statusValidate) {
+                console.log("No se encontró la configuración STATUS_ALLOWED_INIT, se usará el estado por defecto '2'");
+                statusValidate = '2'; //por defecto solo el estado 2 - en progreso
+            }
+            if (!statusValidate.includes(existingVisitById.statusId)) {
+                return res.status(200).json({ message: `La visita técnica ya ha sido iniciada o finalizada, no se puede volver a iniciar` });
+            }
             //actualizar el estado de la visita tecnica
             console.log("actualizando el estado de la visita tecnica");
             const resultUpdate = await visitService.updateStatusVisitToInProgress(visitId);
@@ -89,7 +98,7 @@ export class AppController {
                 return res.status(500).json({ message: "No fue posible actualizar el estado de la visita técnica" });
             }
             console.log("Estado de la visita técnica actualizado exitosamente");
-            return res.status(200).json({ message: "Estado de la visita técnica actualizado exitosamente" });
+            return res.status(200).json({ message: "La visita técnica ha sido iniciada exitosamente" });
         } catch (error) {
             console.error("Error en updateStatusVisit:", error);
             return res.status(500).json({ message: "Error interno del servidor", error: error.message });
