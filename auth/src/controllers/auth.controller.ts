@@ -95,7 +95,9 @@ export class AuthController {
 
             console.log("validando seguridad de la nueva contraseña");
             //validar que la contrseña sea alfanumerica, tenga al menos 8 caracteres, una mayuscula, una minuscula, un caracter especial
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#_\-.,+/])[A-Za-z\d@$!%*?&#_\-.,+/]{8,}$/;
+
             if (!passwordRegex.test(newPassword)) {
                 res.status(400);
                 res.json({ message: "La nueva contraseña no cumple con los requisitos de seguridad. Debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial." });
