@@ -30,7 +30,7 @@ export class AppController {
             } else if (currentUser.roleId == 2) {
                 console.log("El usuario es supervisor, puede ver solo su información");
                 //si es supervisor (2) puede ver solo su informacion
-                const supervisors = await visitService.getSupervisorsById(currentUser.id);
+                const supervisors = await visitService.getSupervisorsById(currentUser.userId);
                 if (supervisors.length === 0) {
                     return res.status(404).json({ message: "No se encontró supervisores" });
                 }
