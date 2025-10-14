@@ -62,7 +62,23 @@ export class AppController {
             if (!visit) {
                 return res.status(404).json({ message: "Visita técnica no encontrada" });
             }
-            return res.status(200).json({ data: visit });
+
+            //obtener permisos del usuario actual
+            const currentUser = res.locals.currentUser;
+            console.log("Usuario actual:", currentUser);
+            const permissions = await authService.getPermissionByRole(currentUser.roleId);
+
+            let showButtonsOperations = false;
+            //validar que tenga el permiso operation-tech
+            const hasPermission = permissions?.some((perm: any) => perm.CODE == 'operation-tech');
+            if (!hasPermission) {
+                console.log("El usuario no tiene permiso para ver la visita tecnica");
+                showButtonsOperations = false;
+            }else{
+                showButtonsOperations = true;
+            }
+
+            return res.status(200).json({ data: {...visit, showButtonsOperations} });
         } catch (error) {
             console.error("Error al obtener la visita técnica:", error);
             return res.status(500).json({ message: "Error interno del servidor", error: error.message });
