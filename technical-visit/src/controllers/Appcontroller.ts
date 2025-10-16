@@ -72,7 +72,7 @@ export class AppController {
             //validar que tenga el permiso operation-tech
             const hasPermission = permissions?.some((perm: any) => perm.CODE == 'operation-tech');
             if (!hasPermission) {
-                console.log("El usuario no tiene permiso para ver la visita tecnica");
+                console.log("El usuario no tiene permiso para las operaciones");
                 showButtonsOperations = false;
             }else{
                 showButtonsOperations = true;

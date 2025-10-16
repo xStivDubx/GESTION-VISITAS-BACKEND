@@ -56,10 +56,10 @@ export class VisitService {
         return rows[0] as any;
     }
 
-    async getVisitByTechnicianAndDate(technicianId: number, visitDate: string): Promise<any> {
+    async getVisitByTechnicianAndDate(technicianId: number, visitDate: string, plannedStart: string, plannedEnd: string): Promise<any> {
         const query = await configService.getConfig('QUERY_VISIT_BY_TECHNICIAN_AND_DATE');
         if (!query) throw new Error('No se encontró la configuración para QUERY_VISIT_BY_TECHNICIAN_AND_DATE');
-        const [rows] = await db.query<RowDataPacket[]>(query, [technicianId, visitDate]);
+        const [rows] = await db.query<RowDataPacket[]>(query, [technicianId, visitDate, plannedEnd, plannedStart]);
         return rows[0] as any;
     }
 
@@ -69,12 +69,12 @@ export class VisitService {
         return rows[0] as any;
     }
 
-    async createVisitTechnical(name: string, description: string, siteId: number, supervisorId: number, technicianId: number, visitDate: string, comment: string): Promise<number> {
+    async createVisitTechnical(name: string, description: string, siteId: number, supervisorId: number, technicianId: number, visitDate: string, comment: string, plannedStart: string, plannedEnd: string): Promise<number> {
         try {
             console.log("ingresando al metodo de createVisitTechnical en el servicio");
-            const query = ` INSERT INTO TRA_VISIT (NAME, DESCRIPTION, SITE_ID, SUPERVISOR_ID, TECHNICIAN_ID, VISIT_DATE, COMMENT) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?) `;
-            const [result] = await db.query<ResultSetHeader>(query, [name, description, siteId, supervisorId, technicianId, visitDate, comment]);
+            const query = ` INSERT INTO TRA_VISIT (NAME, DESCRIPTION, SITE_ID, SUPERVISOR_ID, TECHNICIAN_ID, VISIT_DATE, COMMENT, PLANNED_START_TIME, PLANNED_END_TIME) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) `;
+            const [result] = await db.query<ResultSetHeader>(query, [name, description, siteId, supervisorId, technicianId, visitDate, comment, plannedStart, plannedEnd]);
             if (result.affectedRows === 0) {
                 return 0;
             }
@@ -86,7 +86,7 @@ export class VisitService {
     }
 
 
-    async updateVisitTechnical(visitId: number, name: string, description: string, siteId: number, supervisorId: number, technicianId: number, visitDate: string, comment: string): Promise<number> {
+    async updateVisitTechnical(visitId: number, name: string, description: string, siteId: number, supervisorId: number, technicianId: number, visitDate: string, comment: string, plannedStart: string, plannedEnd: string): Promise<number> {
         try {
             console.log("ingresando al metodo de updateVisitTechnical en el servicio");
             const query = ` UPDATE TRA_VISIT 
@@ -96,9 +96,11 @@ export class VisitService {
                                 SUPERVISOR_ID = ?,
                                 TECHNICIAN_ID = ?,
                                 VISIT_DATE = ?,
-                                COMMENT = ?
+                                COMMENT = ?,
+                                PLANNED_START_TIME = ?,
+                                PLANNED_END_TIME = ?
                             WHERE VISIT_ID = ? `;
-            const [result] = await db.query<ResultSetHeader>(query, [name, description, siteId, supervisorId, technicianId, visitDate, comment, visitId]);
+            const [result] = await db.query<ResultSetHeader>(query, [name, description, siteId, supervisorId, technicianId, visitDate, comment, plannedStart, plannedEnd, visitId]);
 
             if (result.affectedRows === 0) {
                 return 0;

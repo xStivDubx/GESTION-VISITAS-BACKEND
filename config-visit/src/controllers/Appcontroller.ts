@@ -137,10 +137,10 @@ export class AppController {
     async createVisitTechnical(req: Request, res: Response): Promise<Response> {
         try {
             console.log("ingresando al metodo de createVisitTechnical");
-            const { name, description, siteId, supervisorId, technicianId, visitDate, comment } = req.body;
+            const { name, description, siteId, supervisorId, technicianId, visitDate, plannedStart, plannedEnd, comment } = req.body;
 
             //validar que los campos obligatorios esten presentes
-            if (!name || !description || !siteId || !supervisorId || !technicianId || !visitDate || !comment) {
+            if (!name || !description || !siteId || !supervisorId || !technicianId || !visitDate || !plannedStart || !plannedEnd || !comment) {
                 return res.status(400).json({ message: "Faltan campos obligatorios" });
             }
 
@@ -160,6 +160,33 @@ export class AppController {
             // Comparar solo las fechas sin considerar la hora
             if (visitDateObj < today) {
                 return res.status(400).json({ message: "La fecha de visita no puede ser menor a la fecha actual" });
+            }
+
+            const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/; // HH:mm o HH:mm:ss
+
+            if (!timeRegex.test(plannedStart) || !timeRegex.test(plannedEnd)) {
+                return res.status(400).json({
+                    message: 'El formato de hora debe ser HH:mm o HH:mm:ss (por ejemplo, 09:00 o 14:30:00).'
+                });
+            }
+
+            // Convertimos a minutos para comparar
+            const [startH, startM] = plannedStart.split(':').map(Number);
+            const [endH, endM] = plannedEnd.split(':').map(Number);
+            const startMinutes = startH * 60 + startM;
+            const endMinutes = endH * 60 + endM;
+
+            if (endMinutes <= startMinutes) {
+                return res.status(400).json({
+                    message: 'La hora de fin debe ser posterior a la hora de inicio.'
+                });
+            }
+
+            //debe de haber al menos 30 minutos de diferencia entre la hora de inicio y fin
+            if (endMinutes - startMinutes < 30) {
+                return res.status(400).json({
+                    message: 'Debe haber al menos 30 minutos de diferencia entre la hora de inicio y fin.'
+                });
             }
 
             //VALIDAR SI LA SEDE Y EL CLIENTE ESTAN ACTIVOS
@@ -186,14 +213,14 @@ export class AppController {
 
             //validar si ya existe una visita tecnica para el mismo tecnico en la misma fecha
             console.log("validando si ya existe una visita tecnica para el mismo tecnico en la misma fecha");
-            const existingVisit = await visitService.getVisitByTechnicianAndDate(technicianId, visitDate);
+            const existingVisit = await visitService.getVisitByTechnicianAndDate(technicianId, visitDate, plannedStart, plannedEnd);
             if (existingVisit) {
-                return res.status(409).json({ message: `El tecnico ya tiene programada la visita tecnica '${existingVisit.NAME}', para la fecha '${visitDate}'` });
+                return res.status(409).json({ message: `El tecnico ya tiene programada la visita tecnica '${existingVisit.NAME}', para la fecha '${visitDate}' y el rango horario '${existingVisit.PLANNED_START_TIME} - ${existingVisit.PLANNED_END_TIME}', debe dejar 1 hora de diferencia.` });
             }
 
             //crear la visita tecnica
             console.log("creando la visita tecnica");
-            const resultInsert = await visitService.createVisitTechnical(name, description, siteId, supervisorId, technicianId, visitDate, comment);
+            const resultInsert = await visitService.createVisitTechnical(name, description, siteId, supervisorId, technicianId, visitDate, comment, plannedStart, plannedEnd);
 
             if (resultInsert === 0) {
                 return res.status(500).json({ message: "No fue posible crear la visita tecnica, favor de intentar nuevamente" });
@@ -232,10 +259,10 @@ export class AppController {
     async updateVisitTechnical(req: Request, res: Response): Promise<Response> {
         try {
             console.log("ingresando al metodo de updateVisitTechnical");
-            const { visitId, name, description, siteId, supervisorId, technicianId, visitDate, comment } = req.body;
+            const { visitId, name, description, siteId, supervisorId, technicianId, visitDate, comment, plannedStart, plannedEnd } = req.body;
 
             //validar que los campos obligatorios esten presentes
-            if (!visitId || !name || !description || !siteId || !supervisorId || !technicianId || !visitDate || !comment) {
+            if (!visitId || !name || !description || !siteId || !supervisorId || !technicianId || !visitDate || !comment || !plannedStart || !plannedEnd) {
                 return res.status(400).json({ message: "Faltan campos obligatorios" });
             }
 
@@ -255,6 +282,33 @@ export class AppController {
             // Comparar solo las fechas sin considerar la hora
             if (visitDateObj < today) {
                 return res.status(400).json({ message: "La fecha de visita no puede ser menor a la fecha actual" });
+            }
+
+            const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/; // HH:mm o HH:mm:ss
+
+            if (!timeRegex.test(plannedStart) || !timeRegex.test(plannedEnd)) {
+                return res.status(400).json({
+                    message: 'El formato de hora debe ser HH:mm o HH:mm:ss (por ejemplo, 09:00 o 14:30:00).'
+                });
+            }
+
+            // Convertimos a minutos para comparar
+            const [startH, startM] = plannedStart.split(':').map(Number);
+            const [endH, endM] = plannedEnd.split(':').map(Number);
+            const startMinutes = startH * 60 + startM;
+            const endMinutes = endH * 60 + endM;
+
+            if (endMinutes <= startMinutes) {
+                return res.status(400).json({
+                    message: 'La hora de fin debe ser posterior a la hora de inicio.'
+                });
+            }
+
+            //debe de haber al menos 30 minutos de diferencia entre la hora de inicio y fin
+            if (endMinutes - startMinutes < 30) {
+                return res.status(400).json({
+                    message: 'Debe haber al menos 30 minutos de diferencia entre la hora de inicio y fin.'
+                });
             }
 
             //validar si ya existe la visita tecnica por ID
@@ -300,14 +354,14 @@ export class AppController {
 
             //validar si ya existe una visita tecnica para el mismo tecnico en la misma fecha y diferente ID de visita
             console.log("validando si ya existe una visita tecnica para el mismo tecnico en la misma fecha");
-            const existingVisit = await visitService.getVisitByTechnicianAndDate(technicianId, visitDate);
+            const existingVisit = await visitService.getVisitByTechnicianAndDate(technicianId, visitDate, plannedStart, plannedEnd);
             if (existingVisit && existingVisit.VISIT_ID !== visitId) {
-                return res.status(409).json({ message: `El tecnico ya tiene programada la visita tecnica '${existingVisit.NAME}', para la fecha '${visitDate}'` });
+                return res.status(409).json({ message: `El tecnico ya tiene programada la visita tecnica '${existingVisit.NAME}', para la fecha '${visitDate}' y el rango horario '${existingVisit.PLANNED_START_TIME} - ${existingVisit.PLANNED_END_TIME}', debe dejar 1 hora de diferencia.` });
             }
 
             //actualizar la visita tecnica
             console.log("actualizando la visita tecnica");
-            const resultUpdate = await visitService.updateVisitTechnical(visitId, name, description, siteId, supervisorId, technicianId, visitDate, comment);
+            const resultUpdate = await visitService.updateVisitTechnical(visitId, name, description, siteId, supervisorId, technicianId, visitDate, comment, plannedStart, plannedEnd);
             if (resultUpdate === 0) {
                 return res.status(500).json({ message: "No fue posible actualizar la visita tecnica, favor de intentar nuevamente" });
             }
