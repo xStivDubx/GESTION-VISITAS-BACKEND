@@ -471,6 +471,32 @@ Resources:
         EntryPoints:
           - index.ts
 
+  reportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: report/
+      Handler: index.handler
+      Environment:
+        Variables:
+          DB_URL: !Ref dbUrl
+          JWT_SECRET: !Ref jwtSecret
+          JWT_EXPIRES_IN: !Ref jwtExpiresIn
+      Events:
+        GetReportUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /report/rep-users
+            Method: get
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2022"
+        Sourcemap: false
+        EntryPoints:
+          - index.ts
+
 
 
 # Outputs define las salidas que se mostrarán al finalizar el despliegue
