@@ -146,7 +146,11 @@ export class AppController {
 
             //convertir visitDate a formato YYYY-MM-DD fecha
             console.log("validando la fecha de visita tecnica");
-            const visitDateObj = new Date(visitDate);
+            
+            // Crear la fecha de forma local para evitar problemas de zona horaria
+            const [year, month, day] = visitDate.split('-').map(Number);
+            const visitDateObj = new Date(year, month - 1, day); // month - 1 porque los meses van de 0-11
+            
             if (isNaN(visitDateObj.getTime())) {
                 return res.status(400).json({ message: "Fecha de visita inválida" });
             }
@@ -154,8 +158,22 @@ export class AppController {
             //validar que la fecha no se menor o igual a la fecha actual
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            console.log("Fecha actual:", today);
-            console.log("Fecha de visita (sin hora):", visitDateObj);
+            
+            // Asegurar que visitDateObj también esté a las 00:00:00
+            visitDateObj.setHours(0, 0, 0, 0);
+            
+            // Debug logs para la validación de fecha
+            console.log("=== DEBUG VALIDACIÓN DE FECHA ===");
+            console.log("Fecha enviada (string):", visitDate);
+            console.log("Fecha parseada [year, month-1, day]:", [year, month - 1, day]);
+            console.log("visitDateObj creada localmente:", visitDateObj.toString());
+            console.log("today normalizada:", today.toString());
+            console.log("visitDateObj.getTime():", visitDateObj.getTime());
+            console.log("today.getTime():", today.getTime());
+            console.log("visitDateObj < today:", visitDateObj < today);
+            console.log("visitDateObj.toDateString():", visitDateObj.toDateString());
+            console.log("today.toDateString():", today.toDateString());
+            console.log("===============================");
 
             // Comparar solo las fechas sin considerar la hora
             if (visitDateObj < today) {
@@ -175,6 +193,35 @@ export class AppController {
             const [endH, endM] = plannedEnd.split(':').map(Number);
             const startMinutes = startH * 60 + startM;
             const endMinutes = endH * 60 + endM;
+
+            //validar que la hora inicio no sea menor o igual a la hora actual si la fecha es igual a la actual
+            // Crear fecha/hora actual en zona horaria de Guatemala (GMT-6)
+            const now = new Date();
+            const guatemalaOffset = -6 * 60; // Guatemala es GMT-6 (en minutos)
+            const guatemalaNow = new Date(now.getTime() + (guatemalaOffset * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+            const currentMinutes = guatemalaNow.getHours() * 60 + guatemalaNow.getMinutes();
+            
+            // Debug logs para identificar el problema
+            console.log("=== DEBUG VALIDACIÓN DE HORA (CREATE) ===");
+            console.log("Fecha de visita:", visitDateObj.toDateString());
+            console.log("Fecha actual:", today.toDateString());
+            console.log("Hora actual UTC:", now.toString());
+            console.log("Hora actual Guatemala:", guatemalaNow.toString());
+            console.log("Zona horaria del servidor:", Intl.DateTimeFormat().resolvedOptions().timeZone);
+            console.log("Hora actual Guatemala (HH:mm):", `${guatemalaNow.getHours()}:${guatemalaNow.getMinutes().toString().padStart(2, '0')}`);
+            console.log("Hora de inicio programada:", plannedStart);
+            console.log("Minutos actuales (Guatemala):", currentMinutes);
+            console.log("Minutos de inicio:", startMinutes);
+            console.log("¿Es el mismo día?:", visitDateObj.toDateString() === today.toDateString());
+            console.log("¿startMinutes <= currentMinutes?:", startMinutes <= currentMinutes);
+            console.log("=======================================");
+            
+            if (visitDateObj.toDateString() === today.toDateString() && startMinutes <= currentMinutes) {
+                return res.status(400).json({ 
+                    message: `La hora de inicio (${plannedStart}) no puede ser menor o igual a la hora actual de Guatemala (${guatemalaNow.getHours()}:${guatemalaNow.getMinutes().toString().padStart(2, '0')})` 
+                });
+            }
+
 
             if (endMinutes <= startMinutes) {
                 return res.status(400).json({
@@ -268,7 +315,11 @@ export class AppController {
 
             //convertir visitDate a formato YYYY-MM-DD fecha
             console.log("validando la fecha de visita tecnica");
-            const visitDateObj = new Date(visitDate);
+            
+            // Crear la fecha de forma local para evitar problemas de zona horaria (Guatemala GMT-6)
+            const [year, month, day] = visitDate.split('-').map(Number);
+            const visitDateObj = new Date(year, month - 1, day); // month - 1 porque los meses van de 0-11
+            
             if (isNaN(visitDateObj.getTime())) {
                 return res.status(400).json({ message: "Fecha de visita inválida" });
             }
@@ -276,8 +327,22 @@ export class AppController {
             //validar que la fecha no se menor o igual a la fecha actual
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            console.log("Fecha actual:", today);
-            console.log("Fecha de visita (sin hora):", visitDateObj);
+            
+            // Asegurar que visitDateObj también esté a las 00:00:00
+            visitDateObj.setHours(0, 0, 0, 0);
+            
+            // Debug logs para la validación de fecha
+            console.log("=== DEBUG VALIDACIÓN DE FECHA (UPDATE) ===");
+            console.log("Fecha enviada (string):", visitDate);
+            console.log("Fecha parseada [year, month-1, day]:", [year, month - 1, day]);
+            console.log("visitDateObj creada localmente:", visitDateObj.toString());
+            console.log("today normalizada:", today.toString());
+            console.log("visitDateObj.getTime():", visitDateObj.getTime());
+            console.log("today.getTime():", today.getTime());
+            console.log("visitDateObj < today:", visitDateObj < today);
+            console.log("visitDateObj.toDateString():", visitDateObj.toDateString());
+            console.log("today.toDateString():", today.toDateString());
+            console.log("=======================================");
 
             // Comparar solo las fechas sin considerar la hora
             if (visitDateObj < today) {
@@ -297,6 +362,35 @@ export class AppController {
             const [endH, endM] = plannedEnd.split(':').map(Number);
             const startMinutes = startH * 60 + startM;
             const endMinutes = endH * 60 + endM;
+
+            //validar que la hora inicio no sea menor o igual a la hora actual si la fecha es igual a la actual
+            // Crear fecha/hora actual en zona horaria de Guatemala (GMT-6)
+            const now = new Date();
+            const guatemalaOffset = -6 * 60; // Guatemala es GMT-6 (en minutos)
+            const guatemalaNow = new Date(now.getTime() + (guatemalaOffset * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+            const currentMinutes = guatemalaNow.getHours() * 60 + guatemalaNow.getMinutes();
+            
+            // Debug logs para identificar el problema
+            console.log("=== DEBUG VALIDACIÓN DE HORA (UPDATE) ===");
+            console.log("Fecha de visita:", visitDateObj.toDateString());
+            console.log("Fecha actual:", today.toDateString());
+            console.log("Hora actual UTC:", now.toString());
+            console.log("Hora actual Guatemala:", guatemalaNow.toString());
+            console.log("Zona horaria del servidor:", Intl.DateTimeFormat().resolvedOptions().timeZone);
+            console.log("Hora actual Guatemala (HH:mm):", `${guatemalaNow.getHours()}:${guatemalaNow.getMinutes().toString().padStart(2, '0')}`);
+            console.log("Hora de inicio programada:", plannedStart);
+            console.log("Minutos actuales (Guatemala):", currentMinutes);
+            console.log("Minutos de inicio:", startMinutes);
+            console.log("¿Es el mismo día?:", visitDateObj.toDateString() === today.toDateString());
+            console.log("¿startMinutes <= currentMinutes?:", startMinutes <= currentMinutes);
+            console.log("=======================================");
+            
+            if (visitDateObj.toDateString() === today.toDateString() && startMinutes <= currentMinutes) {
+                return res.status(400).json({ 
+                    message: `La hora de inicio (${plannedStart}) no puede ser menor o igual a la hora actual de Guatemala (${guatemalaNow.getHours()}:${guatemalaNow.getMinutes().toString().padStart(2, '0')})` 
+                });
+            }
+
 
             if (endMinutes <= startMinutes) {
                 return res.status(400).json({
