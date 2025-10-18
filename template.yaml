@@ -488,6 +488,12 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /report/rep-users
             Method: get
+        GetReportClients:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /report/rep-clientes
+            Method: get
     Metadata:
       BuildMethod: esbuild
       BuildProperties:

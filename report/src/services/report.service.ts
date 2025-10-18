@@ -16,5 +16,13 @@ export class ReportService {
         return rows as any[];
     }
 
+
+    async getClients(): Promise<any[]> {
+        const query = await configService.getConfig('REPORT_CLIENTS');
+        if (!query) throw new Error('No se encontró la configuración para QUERY_CLIENT_GETALL');
+
+        const [rows] = await db.query<RowDataPacket[]>(query);
+        return rows as any[];
+    }
     
 }
