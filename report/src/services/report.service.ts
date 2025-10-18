@@ -24,5 +24,13 @@ export class ReportService {
         const [rows] = await db.query<RowDataPacket[]>(query);
         return rows as any[];
     }
+
+    async getVisits(): Promise<any[]> {
+        const query = await configService.getConfig('REPORT_VISITAS');
+        if (!query) throw new Error('No se encontró la configuración para REPORT_VISITAS');
+
+        const [rows] = await db.query<RowDataPacket[]>(query);
+        return rows as any[];
+    }
     
 }
