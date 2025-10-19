@@ -216,7 +216,8 @@ export class AuthController {
             }
 
             if (hasGraphSupervisorPermission) {
-                return res.status(200).json({ data: "exito2" });
+                const data = await graphService.getDataForGraphSupervisor(currentUser.userId);
+                return res.status(200).json({ data: data });
             }
 
             if (hasGraphTechPermission) {

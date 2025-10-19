@@ -54,6 +54,40 @@ export class GraphService {
     }
 
 
+    async getDataForGraphSupervisor(userId:number): Promise<any> {
+        const queryVisitState = await configService.getConfig('GRAPH_STATE_VISIT_SUPERVISOR');
+        if (!queryVisitState) throw new Error('No se encontró la configuración para GRAPH_STATE_VISIT_SUPERVISOR');
+        const [visitState] = await db.query<RowDataPacket[]>(queryVisitState, [userId]);
+
+        const queryTopClients = await configService.getConfig('GRAPH_TOP_CLIENTS_SUPERVISOR');
+        if (!queryTopClients) throw new Error('No se encontró la configuración para GRAPH_TOP_CLIENTS_SUPERVISOR');
+        const [topClients] = await db.query<RowDataPacket[]>(queryTopClients, [userId]);
+
+
+        const queryVisitMonth = await configService.getConfig('GRAPH_VISIT_MONTH_SUPERVISOR');
+        if (!queryVisitMonth) throw new Error('No se encontró la configuración para GRAPH_VISIT_MONTH_SUPERVISOR');
+        const [visitMonth] = await db.query<RowDataPacket[]>(queryVisitMonth, [userId]);
+
+        const queryCardsVisits = await configService.getConfig('CARDS_VISITS_SUPERVISOR');
+        if (!queryCardsVisits) throw new Error('No se encontró la configuración para CARDS_VISITS_SUPERVISOR');
+        const [cardsVisits] = await db.query<RowDataPacket[]>(queryCardsVisits, [userId, userId, userId, userId]);
+
+        const queryVisitCancel = await configService.getConfig('GRAPH_VISIT_CANCEL_SUPERVISOR');
+        if (!queryVisitCancel) throw new Error('No se encontró la configuración para GRAPH_VISIT_CANCEL_SUPERVISOR');
+        const [visitCancel] = await db.query<RowDataPacket[]>(queryVisitCancel, [userId]);
+
+        let graphData={
+            visitState:  visitState,
+            topClients:  topClients,
+            visitMonth:  visitMonth,
+            visitCancel: visitCancel,
+            cardsVisits: cardsVisits[0]
+        }
+
+
+        return graphData;
+    }
+
 
 
 
