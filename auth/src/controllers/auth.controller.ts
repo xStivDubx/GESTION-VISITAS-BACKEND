@@ -221,7 +221,8 @@ export class AuthController {
             }
 
             if (hasGraphTechPermission) {
-                return res.status(200).json({ data: "exito3" });
+                const data = await graphService.getDataForGraphTech(currentUser.userId);
+                return res.status(200).json({ data: data });
             }
 
             res.status(200).json({ message: "No tiene permisos para visualizar gráficos" });
