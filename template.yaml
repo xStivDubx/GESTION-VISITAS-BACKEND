@@ -91,6 +91,12 @@ Resources:
             RestApiId: !Ref ApiGateway
             Path: /auth/change-password
             Method: post
+        DataGraphs:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /auth/data-graphs
+            Method: get
     Metadata:
       BuildMethod: esbuild
       BuildProperties:

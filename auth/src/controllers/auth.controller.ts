@@ -3,10 +3,12 @@ import { UserService } from '../services/user.service';
 import bcrypt from "bcryptjs";
 import { createToken } from '../utils/jwt';
 import { RolePermissionService } from '../services/rolePermission.service';
+import { GraphService } from '../services/graph.service';
 
 
 const userService = new UserService();
 const rolePermissionService = new RolePermissionService();
+const graphService = new GraphService();
 
 export class AuthController {
 
@@ -146,10 +148,6 @@ export class AuthController {
 
     }
 
-
-
-
-
     profile = async (req: Request, res: Response) => {
 
         try {
@@ -190,5 +188,50 @@ export class AuthController {
             return;
         }
     };
+
+
+
+    getDataForGraph = async (req: Request, res: Response) => {
+        try{
+
+            const currentUser = res.locals.currentUser;
+
+            // buscar permisos del usuario
+            const permissions = await rolePermissionService.getAllPermissions(currentUser.roleId);
+
+            if (!permissions) {
+                res.status(404);
+                res.json({ message: "No se encontraron permisos para el rol" });
+                return;
+            }
+
+            // validar que tenga el permiso /graph-admin -> que retorne exito1, /graph-supervisor que retorne exito2, /graph-tech -> que retorne exito3, si no tiene, retornar error 403
+            const hasGraphAdminPermission = permissions.some(permission => permission.CODE === '/graph-admin');
+            const hasGraphSupervisorPermission = permissions.some(permission => permission.CODE === '/graph-supervisor');
+            const hasGraphTechPermission = permissions.some(permission => permission.CODE === '/graph-tech');
+
+            if (hasGraphAdminPermission) {
+                const data = await graphService.getDataForGraphAdmin();
+                return res.status(200).json({ data: data });
+            }
+
+            if (hasGraphSupervisorPermission) {
+                return res.status(200).json({ data: "exito2" });
+            }
+
+            if (hasGraphTechPermission) {
+                return res.status(200).json({ data: "exito3" });
+            }
+
+            res.status(200).json({ message: "No tiene permisos para visualizar gráficos" });
+            return;
+
+        }catch (error) {
+            console.error("Error en el proceso de obtención de datos para el gráfico:", error);
+            res.status(500).json({ message: "Ocurrió un error en el proceso de obtención de datos para el gráfico", error: error.message });
+            return;
+        }
+    }
+
 }
 
