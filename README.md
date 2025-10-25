@@ -8,10 +8,7 @@
 4. [Arquitectura General](#arquitectura-general)
 5. [Estructura del Proyecto](#estructura-del-proyecto)
 6. [API Endpoints](#api-endpoints)
-7. [Casos de Uso](#casos-de-uso)
-8. [Flujos de Secuencia](#flujos-de-secuencia)
-9. [Pruebas](#pruebas)
-10. [Instalación y Ejecución Local](#instalación-y-ejecución-local)
+7. [Instalación y Ejecución Local](#instalación-y-ejecución-local)
 
 ---
 
@@ -150,7 +147,7 @@ backend/
 
 ---
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Autenticación
 | Método | Ruta | Descripción | Autenticación |
@@ -228,38 +225,6 @@ backend/
 
 ---
 
-## Pruebas
-
-### Pruebas Unitarias
-```bash
-# Ejecutar pruebas unitarias para un microservicio específico
-cd auth/
-npm test
-
-# Ejecutar pruebas con cobertura
-npm run test:coverage
-```
-
-### Pruebas de Integración
-```bash
-# Iniciar todos los servicios localmente
-sam local start-api
-
-# Ejecutar pruebas de integración
-npm run test:integration
-```
-
-### Pruebas End-to-End
-```bash
-# Desplegar en ambiente de staging
-sam deploy --config-env staging
-
-# Ejecutar suite de pruebas E2E
-npm run test:e2e
-```
-
----
-
 ## Instalación y Ejecución Local
 
 ### Prerrequisitos
@@ -294,19 +259,6 @@ for dir in auth user client role technical-visit config-visit report mail config
 done
 ```
 
-### 4. Configurar Base de Datos
-```sql
--- Crear base de datos
-CREATE DATABASE gestion_visitas;
-
--- Crear usuario
-CREATE USER 'visitas_user'@'localhost' IDENTIFIED BY 'tu_password';
-GRANT ALL PRIVILEGES ON gestion_visitas.* TO 'visitas_user'@'localhost';
-FLUSH PRIVILEGES;
-
--- Ejecutar scripts de migración (si existen)
--- mysql -u visitas_user -p gestion_visitas < migrations/init.sql
-```
 
 ### 5. Compilar Proyecto
 ```bash
